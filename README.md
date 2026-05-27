@@ -118,6 +118,31 @@ The HTML one-pager is the shareable artifact: self-contained, zero dependencies,
 
 ---
 
+## Cost per audit
+
+Calibrated against two real runs in May 2026 (Claude Opus 4.7 with prompt caching enabled):
+
+| Site | URLs crawled | Pages scored | Wall time | API cost |
+|---|---|---|---|---|
+| anthropic.com | 4,042 | 352 | 31 min | $3.94 |
+| praxent.com | 3,356 | 505 | 25 min | $5.85 |
+
+**Typical audit cost: ~$3 to $6 USD per run** for sites with 300 to 500 indexable pages. Most input tokens are template + rubric + skill context, all cache-hittable across the audit's many tool calls, so the cache-read price ($1.50/M) dominates over the full input price.
+
+Cheaper options:
+
+- **Claude Sonnet 4.6 instead of Opus 4.7:** roughly 5x cheaper, so about $0.60 to $1.20 per audit. Set the model explicitly when invoking the skill if you want to trade some scoring nuance for cost.
+- **Smaller crawls:** the per-URL cost is dominated by the per-page scoring loop, not the crawl size, so capping at 100 URLs does not cut cost by 5x. Expect closer to half.
+
+More expensive cases:
+
+- **Prompt caching disabled:** about 3x more expensive. Most of the savings here come from reusing the rubric and report template across page scoring.
+- **JS rendering on (for SPAs):** crawl time grows, more content per page reaches the scorer. Add 30% to 50%.
+
+These numbers will move as Claude pricing and the underlying skill evolve. The two source audits live in this repo's git log under the `docs: calibrate cost-per-audit` commit if you want to re-derive.
+
+---
+
 ## Custom scoping
 
 The skill accepts these scoping inputs in your prompt:
