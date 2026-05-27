@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "screaming-frog": {
+      "command": "/Applications/Screaming Frog SEO Spider.app/Contents/MacOS/ScreamingFrogSEOSpiderLauncher",
+      "args": ["--mcp-server"],
+      "env": {}
+    }
+  }
+}

@@ -1,0 +1,32 @@
+# Reports for real sites — keep examples, ignore audits of actual domains
+reports/*
+!reports/.gitkeep
+!reports/example.com/
+
+# Screaming Frog crawl files
+*.seospider
+*.dbseospider
+
+# Node (only relevant if using community MCP)
+node_modules/
+package-lock.json
+.npm
+
+# Env / secrets
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Claude Code session/local
+.claude/settings.local.json
+
+# Personal / non-repo working files
+LINKEDIN_POST.md

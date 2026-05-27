@@ -1,0 +1,18 @@
+# {{site_name}}
+
+> {{site_purpose_one_sentence}}
+
+{{#sections}}
+## {{section_name}}
+
+{{#pages}}
+- [{{title}}]({{url}}): {{summary}}
+{{/pages}}
+
+{{/sections}}
+
+## Optional
+
+{{#optional_pages}}
+- [{{title}}]({{url}}): {{summary}}
+{{/optional_pages}}

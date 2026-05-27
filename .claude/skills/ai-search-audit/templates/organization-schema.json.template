@@ -1,0 +1,21 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "{{site_name}}",
+  "url": "https://{{domain}}",
+  "logo": "TODO: absolute URL to logo",
+  "description": "TODO: 1-2 sentence company description",
+  "foundingDate": "TODO: YYYY-MM-DD",
+  "sameAs": [
+    "TODO: LinkedIn company URL",
+    "TODO: Crunchbase URL",
+    "TODO: Wikipedia URL (if exists)",
+    "TODO: X / Twitter URL"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer support",
+    "email": "TODO: support email",
+    "url": "TODO: contact page URL"
+  }
+}

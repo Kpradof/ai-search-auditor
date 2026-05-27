@@ -1,0 +1,32 @@
+# example.com
+
+> Example.com is a B2B observability platform that helps engineering teams find and fix production issues 10x faster through unified logs, traces, and metrics.
+
+## Product
+
+- [Pricing](https://example.com/pricing): Plans start at $99/mo for 10 users with 30-day retention. Enterprise tier includes SSO, audit logs, and dedicated support.
+- [Features](https://example.com/features): Unified observability across logs, metrics, distributed traces, and front-end RUM in a single timeline view.
+- [Integrations](https://example.com/integrations): 87 native integrations including AWS, GCP, Kubernetes, Datadog import, PagerDuty, Slack, GitHub.
+- [Security](https://example.com/security): SOC 2 Type II, ISO 27001, HIPAA-ready, EU data residency, customer-managed encryption keys.
+
+## Docs
+
+- [Getting Started](https://example.com/docs/getting-started): Install the agent, send your first event, and build your first dashboard in under 10 minutes.
+- [API Reference](https://example.com/docs/api): REST and GraphQL APIs for ingestion, query, and admin operations.
+- [Query Language](https://example.com/docs/query-language): SQL-like syntax for querying logs and traces with examples.
+
+## Blog
+
+- [Why we built example.com](https://example.com/blog/why-we-built): Origin story and product philosophy.
+- [The new observability stack](https://example.com/blog/new-observability): How the unified data model changes incident response.
+- [Migrating from Datadog](https://example.com/blog/migrate-from-datadog): Step-by-step migration guide with cost comparison.
+
+## Customers
+
+- [Customer stories](https://example.com/customers): Case studies from Acme Corp, Globex, and Initech.
+
+## Optional
+
+- [About](https://example.com/about): Company history, team, and values.
+- [Careers](https://example.com/careers): Open roles in engineering, product, and go-to-market.
+- [Contact](https://example.com/contact): Sales, support, and partnership inquiries.

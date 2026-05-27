@@ -1,0 +1,23 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "url": "{{url}}",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "TODO: question 1",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TODO: definitive 2-3 sentence answer 1"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "TODO: question 2",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TODO: definitive 2-3 sentence answer 2"
+      }
+    }
+  ]
+}

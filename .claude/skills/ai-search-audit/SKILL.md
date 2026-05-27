@@ -1,0 +1,240 @@
+---
+name: ai-search-audit
+description: Audit a website for AI-search readiness (ChatGPT, Claude, Perplexity, Google AI Overviews) using Screaming Frog MCP for the crawl and a deterministic rubric for scoring. Outputs a per-page citability score, a generated llms.txt, a robots.txt patch for AI bots, schema-patch suggestions, and content-restructure recs. Use when the user says "AI search audit", "GEO audit", "AEO audit", "rank in ChatGPT", "llms.txt", "citability check", "/ai-search-audit", or provides a URL alongside any of these phrases.
+---
+
+# AI Search Readiness Audit
+
+End-to-end audit of how citable a website is in generative search engines (ChatGPT, Claude, Perplexity, Google AI Overviews, Gemini). Uses the Screaming Frog MCP server for crawl + extraction, applies a deterministic scoring rubric, generates fixes a developer can ship.
+
+## When to use
+
+- User asks how their site ranks / appears in ChatGPT, Claude, Perplexity, or AI Overviews.
+- User wants a GEO (Generative Engine Optimization) or AEO (Answer Engine Optimization) audit.
+- User wants an `llms.txt` generated.
+- User asks whether their content is "citable" by LLMs.
+- User provides a URL and mentions any of: AI search, LLM SEO, llms.txt, citability, AI Overviews, Perplexity, GPTBot.
+
+## Required setup
+
+Before running, the Screaming Frog MCP server must be configured and reachable. Verify by listing available MCP tools — you should see tools from the `screaming-frog` server (typically `crawl`, `export`, `get_crawl_data`, or similarly named).
+
+If the MCP server is not available, stop and direct the user to the setup steps in `README.md` of this repo (`.mcp.json` is checked in but the user must have Screaming Frog SEO Spider v24+ installed locally with a valid license).
+
+## The audit dimensions
+
+Five dimensions, each scored 0–20, total out of 100 per page and per site:
+
+1. **Bot Access (0–20)** — robots.txt posture for GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Bytespider, CCBot, anthropic-ai, OAI-SearchBot, Applebot-Extended.
+2. **Discovery (0–20)** — presence + quality of `/llms.txt`, `/llms-full.txt`, sitemap.xml, RSS, canonical hygiene.
+3. **Structure (0–20)** — schema.org coverage (Article, FAQPage, HowTo, Product, Organization, Person, BreadcrumbList), heading hierarchy, semantic HTML.
+4. **Citability (0–20)** — content patterns that LLMs cite: definitive answers in the first 100 words, Q&A blocks, bulleted facts, named-entity density, author bylines, dates, citations to primary sources.
+5. **Authority Signals (0–20)** — explicit author/entity markup, About page presence, external citations to primary research, internal linking depth to "answer" pages.
+
+Full per-dimension rubric in `.claude/skills/ai-search-audit/rubric.md`.
+
+## Workflow
+
+### 1. Confirm scope
+
+Ask the user (skip if already in request):
+- Target URL.
+- Crawl cap (default: 500 URLs).
+- JS rendering on/off (default: off — turn on for SPAs).
+- Page-set focus: full site, blog only, product pages only, etc.
+
+### 2. Pre-crawl checks (no crawl yet)
+
+Fetch the following root files directly before crawling — these inform the whole audit:
+- `https://<domain>/robots.txt`
+- `https://<domain>/llms.txt`
+- `https://<domain>/llms-full.txt`
+- `https://<domain>/sitemap.xml`
+
+Record presence + content. The Bot Access and Discovery scores partly derive from these without needing a full crawl.
+
+### 3. Run crawl via Screaming Frog MCP
+
+Call the Screaming Frog MCP `crawl` tool with the agreed parameters. Configure custom extractions where possible to grab:
+- All schema.org JSON-LD blocks (full content).
+- First 200 words of `main` / `article` content (for citability analysis).
+- `<meta name="author">`, `<meta property="article:author">`.
+- All `<h1>`, `<h2>`, `<h3>` text.
+- `og:type`, `og:title`, `og:description`.
+
+Wait for crawl completion.
+
+### 4. Pull exports
+
+From the MCP server, pull:
+- Internal: All (status, indexability, word count, response time).
+- Structured Data: All (with full JSON-LD blocks).
+- Page Titles, Meta Descriptions, H1, H2.
+- Canonicals.
+- Custom Extraction results.
+
+### 5. Score per page
+
+For each indexable 200 URL, compute the five dimension scores per the rubric. Store as a table.
+
+Per-page total = sum of dimension scores (max 100).
+
+Bucket pages:
+- **Strong (80–100)**: citation-ready as-is.
+- **Decent (60–79)**: minor fixes unlock citability.
+- **Weak (40–59)**: structural problems, needs rework.
+- **Invisible (0–39)**: LLMs will skip these.
+
+### 6. Score the site
+
+Site score = weighted aggregate:
+- Bot Access: site-level (one value, copy to every page).
+- Discovery: site-level.
+- Structure / Citability / Authority: average across top-50 most-linked pages (these are the ones LLMs most likely encounter).
+
+### 7. Generate fix artifacts
+
+Always generate the following, even if empty/minimal:
+
+**A. `reports/<domain>/llms.txt`** — built from the crawl. Format per the llmstxt.org spec:
+```
+# <Site name>
+
+> <One-sentence site purpose, derived from homepage title + meta description>
+
+## <Section name, e.g. Docs / Blog / Products>
+- [<Page title>](<URL>): <one-line summary derived from meta description or first paragraph>
+...
+```
+Limit to top 50 pages by inlink count, grouped by URL path prefix.
+
+**B. `reports/<domain>/robots-ai-bots-patch.txt`** — robots.txt block to add/replace. If bots are blocked, generate the unblock patch. If allowed, generate verification snippet. Comment each bot with provenance link.
+
+**C. `reports/<domain>/schema-patches/`** — one JSON-LD file per page that is missing a recommended schema type. Filename: URL slug + `.json`. Pre-populate with what can be inferred from crawl data; mark unknown fields with `"TODO: <human-readable note>"`.
+
+**D. `reports/<domain>/content-rewrite-recs.md`** — for each Weak/Invisible page in the top-50 by inlinks: specific restructuring recommendation. Format: current opening (quoted), problem (one line), suggested rewrite of first paragraph (Q&A or definitive-answer style).
+
+### 8. Write the main report (markdown + HTML one-pager)
+
+Two formats, same data, both written every run.
+
+#### 8a. Markdown report
+
+`reports/<domain>/audit-<YYYY-MM-DD>.md`:
+
+```markdown
+# AI Search Readiness Audit — <domain>
+
+**Crawled:** <date> · **URLs crawled:** <n> · **JS rendering:** on/off
+**Site score:** <n>/100 · **Top-50 page average:** <n>/100
+
+## Headline finding
+<one paragraph in plain English — what's the biggest unlock to becoming citable in ChatGPT/Claude/Perplexity?>
+
+## Score breakdown
+| Dimension | Score | What's blocking max |
+|---|---|---|
+| Bot Access | x/20 | ... |
+| Discovery | x/20 | ... |
+| Structure | x/20 | ... |
+| Citability | x/20 | ... |
+| Authority  | x/20 | ... |
+
+## Top 5 fixes that move the needle
+1. <fix> — effort: S/M/L · expected score gain: +n
+2. ...
+
+## Page buckets
+- Strong: n pages (sample: ...)
+- Decent: n pages
+- Weak: n pages
+- Invisible: n pages (top inlink-count first — these are the priorities)
+
+## Generated artifacts
+- `llms.txt`: `reports/<domain>/llms.txt`
+- Robots patch: `reports/<domain>/robots-ai-bots-patch.txt`
+- Schema patches: `reports/<domain>/schema-patches/` (<n> files)
+- Content rewrite recs: `reports/<domain>/content-rewrite-recs.md`
+
+## Appendix — full per-page scores
+<table>
+```
+
+#### 8b. HTML one-pager
+
+Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search-audit/templates/report.html.template`. The template is a self-contained one-pager (no external deps, no CDN, inline CSS) designed to:
+
+- Open directly in any browser.
+- Print clean to PDF (A4 / Letter).
+- Auto-respond to light/dark system theme.
+- Be screenshot-friendly for LinkedIn / Slack sharing.
+
+**Placeholder substitution.** Read the template as a string, replace every `{{name}}` token with the corresponding value computed during scoring. Required tokens:
+
+| Token | Value |
+|---|---|
+| `{{domain}}` | site domain |
+| `{{crawl_date}}` | ISO date of crawl |
+| `{{urls_crawled}}` | integer |
+| `{{js_rendering}}` | `"on"` or `"off"` |
+| `{{repo_owner}}` | GitHub user/org for branding link — read from `package.json` `repository` field or default to `ai-search-auditor` |
+| `{{site_score}}` | 0–100 integer |
+| `{{top50_avg}}` | 0–100 integer |
+| `{{headline_finding_html}}` | HTML-escaped paragraph; wrap the single most important phrase in `<strong>...</strong>` |
+| `{{bot_access}}`, `{{discovery}}`, `{{structure}}`, `{{citability}}`, `{{authority}}` | each 0–20 |
+| `{{bot_access_pct}}` … `{{authority_pct}}` | same value × 5 (since max is 20) |
+| `{{bot_access_blocker}}` … `{{authority_blocker}}` | one-line blocker text, HTML-escaped |
+| `{{fixes_html}}` | five `.fix` divs, see template format below |
+| `{{bucket_strong}}`, `{{bucket_decent}}`, `{{bucket_weak}}`, `{{bucket_invisible}}` | page counts |
+| `{{priority_rows_html}}` | `<tr>` rows for top-10 invisible pages by inlink count |
+| `{{artifacts_html}}` | one `.artifact` div per generated file |
+| `{{expected_post_fix_score}}` | integer estimate after top-5 fixes shipped |
+
+**`.fix` div format** (inject into `{{fixes_html}}`):
+```html
+<div class="fix">
+  <div class="rank">1</div>
+  <div class="text">Publish <code>llms.txt</code> at the site root. Generated file at <code>reports/example.com/llms.txt</code> is deploy-ready.</div>
+  <div class="meta"><span class="pill s">S</span> · +6 pts</div>
+</div>
+```
+Use class `s` / `m` / `l` on the `.pill` matching effort. Repeat for all five fixes.
+
+**`<tr>` row format** for priority table:
+```html
+<tr>
+  <td><a href="{{url}}">{{path}}</a></td>
+  <td>{{inlinks}}</td>
+  <td class="score bad">{{score}}</td>
+  <td>{{top_miss}}</td>
+</tr>
+```
+Class on `.score` cell: `bad` if <40, `warn` if 40–59, `good` if ≥60.
+
+**`.artifact` div format**:
+```html
+<div class="artifact">
+  <div class="ico">TXT</div>
+  <div><div><strong>llms.txt</strong></div><code>reports/example.com/llms.txt</code></div>
+</div>
+```
+Icon labels: `TXT` for `.txt`, `MD` for `.md`, `JSN` for `.json`, `DIR` for directories.
+
+**Escape HTML** in all values that may contain user content (titles, headline finding, blockers). Do not escape generated HTML fragments themselves (`{{fixes_html}}`, `{{priority_rows_html}}`, `{{artifacts_html}}`, `{{headline_finding_html}}`).
+
+### 9. Hand off
+
+Surface to chat:
+- Site score one-liner.
+- Path to **HTML one-pager** (`reports/<domain>/audit-<YYYY-MM-DD>.html`) — this is the shareable artifact, lead with it.
+- Path to markdown report.
+- Single highest-leverage fix.
+- Offer: "Want me to open the HTML in your browser / apply the robots.txt patch / commit the llms.txt to the repo / open a PR with schema patches?"
+
+## Output rules
+
+- Always write artifacts to `reports/<domain>/`. Never dump full report into chat.
+- Chat response stays under ~15 lines: score, one-line headline, single top fix, file paths.
+- Every recommendation must reference a specific URL from the crawl. No invented examples.
+- Never use marketing language ("supercharge", "unlock the power of"). Plain, specific, actionable.
+- If a dimension scores max already, say so and move on. No padding.

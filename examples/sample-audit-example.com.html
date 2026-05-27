@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Search Readiness Audit: example.com</title>
+<style>
+  :root {
+    --bg: #0b0d12;
+    --panel: #11141b;
+    --panel-2: #161a23;
+    --ink: #e7ebf3;
+    --ink-dim: #9aa3b2;
+    --accent: #7c5cff;
+    --accent-2: #22d3ee;
+    --good: #34d399;
+    --warn: #fbbf24;
+    --bad: #f87171;
+    --line: #232838;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f7f8fb;
+      --panel: #ffffff;
+      --panel-2: #f1f3f8;
+      --ink: #11141b;
+      --ink-dim: #5a6275;
+      --line: #e4e7ef;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--ink); margin: 0; }
+  body {
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+    padding: 40px 24px 80px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 28px; flex-wrap: wrap; }
+  header h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  header .meta { color: var(--ink-dim); font-size: 13px; }
+  header .brand { font-size: 12px; color: var(--ink-dim); text-align: right; }
+  header .brand a { color: var(--accent-2); text-decoration: none; }
+
+  .hero {
+    display: grid; grid-template-columns: 320px 1fr; gap: 20px;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 24px; margin-bottom: 20px;
+  }
+  @media (max-width: 760px) { .hero { grid-template-columns: 1fr; } }
+
+  .gauge { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .gauge .ring {
+    --size: 200px; --val: 47; --max: 100;
+    width: var(--size); height: var(--size); border-radius: 50%;
+    background:
+      conic-gradient(var(--accent) calc(var(--val) * 1% * 3.6deg), var(--panel-2) 0);
+    display: grid; place-items: center; position: relative;
+  }
+  .gauge .ring::before {
+    content: ""; width: 78%; height: 78%; background: var(--panel); border-radius: 50%; position: absolute;
+  }
+  .gauge .num { position: relative; font-size: 56px; font-weight: 700; letter-spacing: -0.02em; }
+  .gauge .num small { font-size: 18px; color: var(--ink-dim); font-weight: 500; }
+  .gauge .label { margin-top: 10px; color: var(--ink-dim); font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .headline { font-size: 17px; line-height: 1.55; }
+  .headline strong { color: var(--accent-2); }
+
+  .dims { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 760px) { .dims { grid-template-columns: repeat(2, 1fr); } }
+  .dim {
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .dim .name { font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .dim .val { font-size: 24px; font-weight: 700; margin-top: 4px; }
+  .dim .val small { font-size: 13px; color: var(--ink-dim); font-weight: 500; }
+  .dim .bar { height: 6px; background: var(--panel-2); border-radius: 4px; overflow: hidden; margin-top: 10px; }
+  .dim .bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+  .dim .blocker { font-size: 12px; color: var(--ink-dim); margin-top: 8px; line-height: 1.4; }
+
+  section.card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px 24px; margin-bottom: 16px;
+  }
+  section.card h2 { font-size: 18px; margin: 0 0 14px; letter-spacing: -0.01em; }
+
+  .fixes { display: grid; gap: 10px; }
+  .fix { display: grid; grid-template-columns: 28px 1fr auto; gap: 12px; align-items: center; padding: 12px; background: var(--panel-2); border-radius: 10px; }
+  .fix .rank { font-weight: 700; color: var(--accent); font-size: 16px; }
+  .fix .text { font-size: 14px; line-height: 1.5; }
+  .fix .meta { font-size: 12px; color: var(--ink-dim); white-space: nowrap; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .pill.s { background: rgba(52, 211, 153, 0.15); color: var(--good); }
+  .pill.m { background: rgba(251, 191, 36, 0.18); color: var(--warn); }
+  .pill.l { background: rgba(248, 113, 113, 0.18); color: var(--bad); }
+
+  .buckets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  @media (max-width: 760px) { .buckets { grid-template-columns: repeat(2, 1fr); } }
+  .bucket { background: var(--panel-2); border-radius: 10px; padding: 14px; text-align: center; }
+  .bucket .b-num { font-size: 28px; font-weight: 700; }
+  .bucket .b-label { font-size: 12px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+  .bucket.strong .b-num { color: var(--good); }
+  .bucket.decent .b-num { color: var(--accent-2); }
+  .bucket.weak .b-num { color: var(--warn); }
+  .bucket.invisible .b-num { color: var(--bad); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table th, table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  table th { font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  table tbody tr:hover { background: var(--panel-2); }
+  table td.score { font-variant-numeric: tabular-nums; font-weight: 600; }
+  table td.score.bad { color: var(--bad); }
+  table td.score.warn { color: var(--warn); }
+  table td.score.good { color: var(--good); }
+  table td a { color: var(--accent-2); text-decoration: none; word-break: break-all; }
+
+  .artifacts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (max-width: 760px) { .artifacts { grid-template-columns: 1fr; } }
+  .artifact { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--panel-2); border-radius: 10px; font-size: 13px; }
+  .artifact .ico { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 12px; }
+  .artifact code { background: transparent; color: var(--ink-dim); font-size: 12px; }
+
+  footer { text-align: center; color: var(--ink-dim); font-size: 12px; margin-top: 32px; }
+  footer a { color: var(--accent-2); text-decoration: none; }
+
+  @media print {
+    body { padding: 0; }
+    .wrap { max-width: none; }
+    section.card, .hero, .dim { break-inside: avoid; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>AI Search Readiness Audit</h1>
+      <div class="meta">example.com · crawled 2026-05-26 · 412 URLs · JS rendering off</div>
+    </div>
+    <div class="brand">
+      generated by <a href="https://github.com/kpradof/ai-search-auditor">ai-search-auditor</a><br>
+      <span>Screaming Frog MCP · Claude</span>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="gauge">
+      <div class="ring"><div class="num">47<small>/100</small></div></div>
+      <div class="label">Site score</div>
+    </div>
+    <div>
+      <div style="font-size:11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Headline finding</div>
+      <p class="headline">example.com is mid-pack on schema and content quality but <strong>invisible to most AI engines</strong> because it ships no <code>llms.txt</code>, blocks Google-Extended in robots.txt, and buries the answer below the fold on 84% of top-traffic pages. Publishing <code>llms.txt</code> and unblocking AI crawlers alone moves the site score from 47 to 65 in one deploy.</p>
+      <div style="margin-top: 14px; font-size: 13px; color: var(--ink-dim);">Top-50 most-linked pages average <strong style="color: var(--ink);">51/100</strong>.</div>
+    </div>
+  </div>
+
+  <div class="dims">
+    <div class="dim">
+      <div class="name">Bot Access</div>
+      <div class="val">8<small>/20</small></div>
+      <div class="bar"><span style="width: 40%"></span></div>
+      <div class="blocker">7 AI crawlers explicitly disallowed (Google-Extended, Applebot-Extended, OAI-SearchBot, ChatGPT-User, Perplexity-User, anthropic-ai, Claude-Web).</div>
+    </div>
+    <div class="dim">
+      <div class="name">Discovery</div>
+      <div class="val">6<small>/20</small></div>
+      <div class="bar"><span style="width: 30%"></span></div>
+      <div class="blocker">No llms.txt. No llms-full.txt. sitemap.xml present but not declared in robots.txt. RSS missing.</div>
+    </div>
+    <div class="dim">
+      <div class="name">Structure</div>
+      <div class="val">11<small>/20</small></div>
+      <div class="bar"><span style="width: 55%"></span></div>
+      <div class="blocker">Article schema only on blog. Product pages have no schema. No BreadcrumbList anywhere. 3 pages have multiple H1s.</div>
+    </div>
+    <div class="dim">
+      <div class="name">Citability</div>
+      <div class="val">14<small>/20</small></div>
+      <div class="bar"><span style="width: 70%"></span></div>
+      <div class="blocker">Definitive answer in first 100 words on only 16% of blog posts. No FAQ-style sections. No dateModified.</div>
+    </div>
+    <div class="dim">
+      <div class="name">Authority</div>
+      <div class="val">8<small>/20</small></div>
+      <div class="bar"><span style="width: 40%"></span></div>
+      <div class="blocker">Author bylines on blog only, no Person schema. Organization sameAs empty. 12% of articles link to primary sources.</div>
+    </div>
+  </div>
+
+  <section class="card">
+    <h2>Top 5 fixes that move the needle</h2>
+    <div class="fixes">
+      <div class="fix">
+        <div class="rank">1</div>
+        <div class="text">Publish <code>llms.txt</code> at <code>https://example.com/llms.txt</code>. Generated file at <code>reports/example.com/llms.txt</code> is deploy-ready.</div>
+        <div class="meta"><span class="pill s">S</span> · +6 pts</div>
+      </div>
+      <div class="fix">
+        <div class="rank">2</div>
+        <div class="text">Unblock the 7 AI crawlers currently <code>Disallow: /</code>. Patch at <code>reports/example.com/robots-ai-bots-patch.txt</code>. Highest ROI line in this audit.</div>
+        <div class="meta"><span class="pill s">S</span> · +14 pts</div>
+      </div>
+      <div class="fix">
+        <div class="rank">3</div>
+        <div class="text">Add Product schema to the 47 product pages. Patches generated in <code>reports/example.com/schema-patches/</code> with name/description/URL pre-filled.</div>
+        <div class="meta"><span class="pill m">M</span> · +5 pts</div>
+      </div>
+      <div class="fix">
+        <div class="rank">4</div>
+        <div class="text">Rewrite first paragraph on top-20 blog posts by inlink count. Lead with the definitive answer (30-60 words), then expand. See <code>content-rewrite-recs.md</code>.</div>
+        <div class="meta"><span class="pill m">M</span> · +5 pts each</div>
+      </div>
+      <div class="fix">
+        <div class="rank">5</div>
+        <div class="text">Add <code>sameAs</code> array to Organization schema. Link LinkedIn, Crunchbase, X, Wikipedia. Template at <code>schema-patches/organization.json</code>.</div>
+        <div class="meta"><span class="pill s">S</span> · +3 pts</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Page buckets</h2>
+    <div class="buckets">
+      <div class="bucket strong"><div class="b-num">0</div><div class="b-label">Strong 80-100</div></div>
+      <div class="bucket decent"><div class="b-num">23</div><div class="b-label">Decent 60-79</div></div>
+      <div class="bucket weak"><div class="b-num">187</div><div class="b-label">Weak 40-59</div></div>
+      <div class="bucket invisible"><div class="b-num">202</div><div class="b-label">Invisible 0-39</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Priority fix list: invisible pages by inlink count</h2>
+    <table>
+      <thead><tr><th>URL</th><th>Inlinks</th><th>Score</th><th>Top miss</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://example.com/pricing">/pricing</a></td><td>412</td><td class="score bad">31</td><td>No schema, no clear cost answer in first 100 words</td></tr>
+        <tr><td><a href="https://example.com/features">/features</a></td><td>388</td><td class="score bad">34</td><td>Marketing copy walls, no definitive feature definitions</td></tr>
+        <tr><td><a href="https://example.com/integrations">/integrations</a></td><td>294</td><td class="score bad">36</td><td>List page with no individual integration schema</td></tr>
+        <tr><td><a href="https://example.com/security">/security</a></td><td>211</td><td class="score bad">29</td><td>No FAQ schema, no dates, no author byline</td></tr>
+        <tr><td><a href="https://example.com/docs/getting-started">/docs/getting-started</a></td><td>188</td><td class="score bad">33</td><td>No HowTo schema, steps not numbered</td></tr>
+        <tr><td><a href="https://example.com/about">/about</a></td><td>156</td><td class="score bad">37</td><td>Person schema missing for founders</td></tr>
+        <tr><td><a href="https://example.com/customers">/customers</a></td><td>142</td><td class="score bad">35</td><td>No structured testimonial schema</td></tr>
+        <tr><td><a href="https://example.com/blog/category/product">/blog/category/product</a></td><td>138</td><td class="score bad">38</td><td>Category page with no description content</td></tr>
+        <tr><td><a href="https://example.com/contact">/contact</a></td><td>121</td><td class="score bad">28</td><td>Empty page from LLM perspective, no Q&A</td></tr>
+        <tr><td><a href="https://example.com/careers">/careers</a></td><td>98</td><td class="score bad">32</td><td>No JobPosting schema</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Generated artifacts</h2>
+    <div class="artifacts">
+      <div class="artifact"><div class="ico">TXT</div><div><div><strong>llms.txt</strong></div><code>reports/example.com/llms.txt</code></div></div>
+      <div class="artifact"><div class="ico">TXT</div><div><div><strong>robots-ai-bots-patch.txt</strong></div><code>reports/example.com/robots-ai-bots-patch.txt</code></div></div>
+      <div class="artifact"><div class="ico">DIR</div><div><div><strong>schema-patches/</strong> (87 files)</div><code>reports/example.com/schema-patches/</code></div></div>
+      <div class="artifact"><div class="ico">MD</div><div><div><strong>content-rewrite-recs.md</strong></div><code>reports/example.com/content-rewrite-recs.md</code></div></div>
+    </div>
+  </section>
+
+  <footer>
+    Re-audit in 4 weeks after shipping the top fixes. Expected post-fix site score:
+    <strong style="color: var(--ink);">78/100</strong>.
+    <br>
+    Rubric: <a href="https://github.com/kpradof/ai-search-auditor/blob/main/.claude/skills/ai-search-audit/rubric.md">deterministic, auditable</a>.
+  </footer>
+
+</div>
+</body>
+</html>

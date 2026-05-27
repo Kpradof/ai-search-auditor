@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "screaming-frog": {
+      "command": "C:\\Program Files (x86)\\Screaming Frog SEO Spider\\ScreamingFrogSEOSpiderCli.exe",
+      "args": ["--mcp-server"],
+      "env": {}
+    }
+  }
+}
