@@ -1,0 +1,30 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "headline": "What 81,000 people want from AI \\ Anthropic",
+  "description": "Last December, tens of thousands of Claude users around the world had a conversation with our AI interviewer to share how they use AI, what they dream it could make possible, and what they fear it might do.",
+  "url": "https://www.anthropic.com/features/81k-interviews",
+  "datePublished": "TODO: ISO 8601 publish date",
+  "dateModified": "TODO: ISO 8601 last-modified date",
+  "author": {
+    "@type": "Person",
+    "name": "TODO: byline name",
+    "url": "TODO: author profile URL"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Anthropic",
+    "url": "https://www.anthropic.com/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.anthropic.com/images/icons/safari-pinned-tab.svg"
+    },
+    "sameAs": [
+      "https://en.wikipedia.org/wiki/Anthropic",
+      "https://www.linkedin.com/company/anthropicresearch",
+      "https://www.crunchbase.com/organization/anthropic",
+      "https://twitter.com/AnthropicAI",
+      "https://github.com/anthropics"
+    ]
+  }
+}

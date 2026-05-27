@@ -1,0 +1,31 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "headline": "Anthropic at Google Cloud Next 2026 \\ Anthropic",
+  "description": "Find us at Google Cloud Next to learn more about enterprise-ready AI for complex, long-running agents\u2014on your infrastructure, with built-in safety.",
+  "url": "https://www.anthropic.com/events/anthropic-at-google-cloud-next-2026",
+  "datePublished": "TODO: ISO 8601 publish date",
+  "dateModified": "TODO: ISO 8601 last-modified date",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Anthropic",
+    "url": "https://www.anthropic.com/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.anthropic.com/images/icons/safari-pinned-tab.svg"
+    },
+    "sameAs": [
+      "https://en.wikipedia.org/wiki/Anthropic",
+      "https://www.linkedin.com/company/anthropicresearch",
+      "https://www.crunchbase.com/organization/anthropic",
+      "https://twitter.com/AnthropicAI",
+      "https://github.com/anthropics"
+    ]
+  },
+  "startDate": "TODO: ISO 8601 start",
+  "location": {
+    "@type": "Place",
+    "name": "TODO: venue",
+    "address": "TODO"
+  }
+}

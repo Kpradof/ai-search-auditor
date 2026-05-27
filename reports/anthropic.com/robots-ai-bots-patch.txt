@@ -1,0 +1,54 @@
+# AI bot allowlist for www.anthropic.com
+# Current state: User-agent: * Allow: / (all bots implicitly allowed).
+# Optional: explicit per-bot blocks make consent intentional and observable in logs.
+# Add this BELOW the existing 'User-agent: *' block in robots.txt.
+
+# OpenAI training crawler
+# Reference: https://platform.openai.com/docs/gptbot
+User-agent: GPTBot
+Allow: /
+
+# OpenAI ChatGPT Search index
+# Reference: https://platform.openai.com/docs/bots
+User-agent: OAI-SearchBot
+Allow: /
+
+# OpenAI on-demand fetch (ChatGPT browse)
+# Reference: https://platform.openai.com/docs/bots
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic training and Claude citation crawler
+# Reference: https://support.anthropic.com/en/articles/8896518
+User-agent: ClaudeBot
+Allow: /
+
+# Anthropic legacy / Claude web search
+# Reference: https://support.anthropic.com/en/articles/8896518
+User-agent: anthropic-ai
+Allow: /
+
+# Anthropic real-time fetch
+# Reference: https://support.anthropic.com/en/articles/8896518
+User-agent: Claude-Web
+Allow: /
+
+# Perplexity index
+# Reference: https://docs.perplexity.ai/guides/bots
+User-agent: PerplexityBot
+Allow: /
+
+# Perplexity on-demand fetch
+# Reference: https://docs.perplexity.ai/guides/bots
+User-agent: Perplexity-User
+Allow: /
+
+# Google Gemini and AI Overviews opt-in
+# Reference: https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers
+User-agent: Google-Extended
+Allow: /
+
+# Apple Intelligence opt-in
+# Reference: https://support.apple.com/en-us/119829
+User-agent: Applebot-Extended
+Allow: /

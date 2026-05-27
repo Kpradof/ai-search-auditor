@@ -1,0 +1,91 @@
+# Anthropic
+
+> Anthropic is an AI safety company that builds Claude, a family of large language models for reliable, interpretable, and steerable AI.
+
+## Claude
+- [Claude Sonnet 4.6 \ Anthropic](https://www.anthropic.com/claude/sonnet): Hybrid reasoning model with superior intelligence for agents, featuring a 1M context window
+- [Claude Opus 4.7 \ Anthropic](https://www.anthropic.com/claude/opus): Hybrid reasoning model that pushes the frontier for coding and AI agents, featuring a 1M context window
+- [Claude Haiku 4.5 \ Anthropic](https://www.anthropic.com/claude/haiku): Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.
+
+## News
+- [Newsroom \ Anthropic](https://www.anthropic.com/news): Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.
+- [Announcing our updated Responsible Scaling Policy \ Anthropic](https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy): Today we are publishing a significant update to our Responsible Scaling Policy (RSP), the risk governance framework we use to mitigate potential catastrophic ri
+- [Widening the conversation on frontier AI \ Anthropic](https://www.anthropic.com/news/widening-conversation-ai): Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.
+- [Anthropic appoints KiYoung Choi as Representative Director of Korea \ Anthropic](https://www.anthropic.com/news/kiyoung-choi-representative-director-anthropic-korea): KiYoung Choi is joining Anthropic as Representative Director of Korea, ahead of the opening of our Seoul office.
+- [Anthropic co-founder Chris Olah's remarks on Pope Leo XIV's encyclical "Magnifica humanitas" \ Anthropic](https://www.anthropic.com/news/chris-olah-pope-leo-encyclical): The full text of Chris Olah's remarks on the Pope's encyclical on AI
+
+## Product
+- [Anthropic's agentic solution for vulnerability detection | Claude Security \ Anthropic](https://www.anthropic.com/product/security): Claude Security finds vulnerabilities and proposes fixes by reasoning about code, not by pattern-matching.
+- [Claude Code | Anthropic's agentic coding system \ Anthropic](https://www.anthropic.com/product/claude-code): Claude Code is Anthropic's agentic coding system that operates across an entire project to understand codebases, execute multi-file changes, and complete develo
+- [Claude Cowork | Anthropic’s agentic AI for knowledge work \ Anthropic](https://www.anthropic.com/product/claude-cowork): Claude Cowork is a system built by Anthropic that executes multi-step knowledge work on a user's behalf, including research synthesis, document preparation, and
+- [Anthropic’s enterprise offering | Claude Enterprise \ Anthropic](https://www.anthropic.com/product/enterprise): Claude Enterprise is Anthropic's plan for deploying Claude organization-wide with the governance, data controls, and admin infrastructure IT and security teams 
+
+## Events
+- [Events \ Anthropic](https://www.anthropic.com/events): Join Anthropic events: upcoming conferences, webinars, and livestreams. Access past recordings and explore the future of AI safety with Claude.
+- [The Briefing: Enterprise Agents \ Anthropic](https://www.anthropic.com/events/the-briefing-enterprise-agents-virtual-event): The Briefing livestream took place on February 24, 2026. Watch product and engineering leaders from Anthropic to see what's possible when Claude knows your work
+- [The Briefing: Financial Services \ Anthropic](https://www.anthropic.com/events/the-briefing-financial-services-virtual-event): The Briefing: Financial Services is a livestreamed event for the executives leading AI transformation at the world's largest financial institutions. Live from N
+- [Anthropic at AWS re:Invent 2025 \ Anthropic](https://www.anthropic.com/events/aws-re-invent-2025): Anthropic is the leader in enterprise AI, powering frontier intelligence and production-ready AI agents with Claude.
+- [Anthropic at AWS Summit Washington, D.C. 2026 \ Anthropic](https://www.anthropic.com/events/anthropic-at-aws-summit-dc-2026): Join Anthropic at AWS Summit Washington, D.C. to learn how customers are making employees smarter, automating complex operations, and building the next generati
+- [Anthropic at AWS Summit LA 2026 \ Anthropic](https://www.anthropic.com/events/anthropic-at-aws-summit-la-2026): Join Anthropic at AWS Summit LA to learn how customers are making employees smarter, automating complex operations, and building the next generation of AI produ
+- [Anthropic at Google Cloud Next 2026 \ Anthropic](https://www.anthropic.com/events/anthropic-at-google-cloud-next-2026): Find us at Google Cloud Next to learn more about enterprise-ready AI for complex, long-running agents—on your infrastructure, with built-in safety.
+- [Anthropic at AWS Summit New York City 2026 \ Anthropic](https://www.anthropic.com/events/anthropic-at-aws-summit-nyc-2026): Join Anthropic at AWS Summit NYC to learn how customers are making employees smarter, automating complex operations, and building the next generation of AI prod
+- [Anthropic at AWS Summit Toronto 2026 \ Anthropic](https://www.anthropic.com/events/anthropic-at-aws-summit-toronto-2026): Join Anthropic at AWS Summit Toronto to learn how customers are making employees smarter, automating complex operations, and building the next generation of AI 
+- [Builder Summit London \ Anthropic](https://www.anthropic.com/events/london-builder-summit-2025): Join London’s top technical leaders pioneering the next era of AI innovation.
+- [Claude for Financial Services \ Anthropic](https://www.anthropic.com/events/claude-for-financial-services): Claude for Financial Services is an event from Anthropic that brings together senior executives shaping the future of AI in financial services.
+- [AWS re:Invent 2024 \ Anthropic](https://www.anthropic.com/events/aws-reinvent-2024): At Anthropic, we develop large-scale AI systems, and our research teams help us to create safer, steerable, and more reliable models.
+- [Paris Builder Summit \ Anthropic](https://www.anthropic.com/events/paris-builder-summit): Anthropic's first event in Europe, in partnership with Dust.ai.
+- [Google Cloud Next 2025 \ Anthropic](https://www.anthropic.com/events/google-cloud-next-2025): At Anthropic, we develop large-scale AI systems, and our research teams help us to create safer, steerable, and more reliable models.
+- [AWS Summit London \ Anthropic](https://www.anthropic.com/events/aws-summit-london): Explore a vibrant showcase of innovation featuring diverse exhibitors, interactive demonstrations, and cutting-edge solutions from industry leaders and emerging
+- [AWS Summit DC \ Anthropic](https://www.anthropic.com/events/aws-summit-dc): Discover how Amazon Web Services (AWS) public sector customers are adapting to change and challenges and constructing innovative solutions in the cloud.
+- [Seoul Builder Summit \ Anthropic](https://www.anthropic.com/events/seoul-builder-summit): ​As Anthropic grows around the globe, we're excited to spend some time with the Korean startup community in partnership with Coxwave.
+- [AWS Summit NYC \ Anthropic](https://www.anthropic.com/events/aws-summit-nyc): At Anthropic, we develop large-scale AI systems, and our research teams help us to create safer, steerable, and more reliable models.
+
+## Research
+- [Research \ Anthropic](https://www.anthropic.com/research): Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.
+- [Teaching Claude why \ Anthropic](https://www.anthropic.com/research/teaching-claude-why): New research on how we've reduced agentic misalignment
+- [Project Glasswing: An initial update \ Anthropic](https://www.anthropic.com/research/glasswing-initial-update): An early update on what we've learned from Project Glasswing.
+- [2028: Two scenarios for global AI leadership \ Anthropic](https://www.anthropic.com/research/2028-ai-leadership): Our views on the AI competition between the US and China.
+- [Clio: Privacy-preserving insights into real-world AI use \ Anthropic](https://www.anthropic.com/research/clio): A blog post describing Anthropic’s new system, Clio, for analyzing how people use AI while maintaining their privacy
+
+## Home
+- [Home \ Anthropic](https://www.anthropic.com/): Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.
+
+## Transparency
+- [Anthropic’s Transparency Hub \ Anthropic](https://www.anthropic.com/transparency): A look at Anthropic's key processes, programs, and practices for responsible AI development.
+- [Anthropic’s Transparency Hub \ Anthropic](https://www.anthropic.com/transparency/voluntary-commitments): A look at Anthropic's key processes, programs, and practices for responsible AI development.
+
+## Constitution
+- [Claude’s Constitution \ Anthropic](https://www.anthropic.com/constitution): Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.
+
+## Engineering
+- [Engineering \ Anthropic](https://www.anthropic.com/engineering): Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.
+
+## Economic-Futures
+- [Economic Futures \ Anthropic](https://www.anthropic.com/economic-futures): Understanding AI’s effects on the economy over time
+
+## Careers
+- [Careers \ Anthropic](https://www.anthropic.com/careers): Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.
+
+## Learn
+- [AI Learning Resources & Guides from Anthropic \ Anthropic](https://www.anthropic.com/learn): Access comprehensive guides, tutorials, and best practices for working with Claude. Learn how to craft effective prompts and maximize AI interactions in your wo
+
+## Company
+- [Company \ Anthropic](https://www.anthropic.com/company): Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.
+
+## Glasswing
+- [Project Glasswing: Securing critical software for the AI era \ Anthropic](https://www.anthropic.com/glasswing): A new initiative to secure the world’s most critical software and give defenders a durable advantage in the coming AI-driven era of cybersecurity.
+
+## Supported-Countries
+- [Supported countries and regions \ Anthropic](https://www.anthropic.com/supported-countries): Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.
+
+## Responsible-Disclosure-Policy
+- [Responsible Disclosure Policy \ Anthropic](https://www.anthropic.com/responsible-disclosure-policy): Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.
+
+## Economic-Index
+- [The Anthropic Economic Index \ Anthropic](https://www.anthropic.com/economic-index): The Anthropic Economic Index reveals the shape of AI adoption across the world. Here, you can explore the data behind our research to understand how people are 
+
+## Responsible-Scaling-Policy
+- [Responsible Scaling Policy Updates \ Anthropic](https://www.anthropic.com/responsible-scaling-policy): Stay informed about the latest Claude RSP (Responsible Scaling Policy) updates and improvements. Learn how Anthropic maintains safety and reliability in AI deve
+
+## Features
+- [What 81,000 people want from AI \ Anthropic](https://www.anthropic.com/features/81k-interviews): Last December, tens of thousands of Claude users around the world had a conversation with our AI interviewer to share how they use AI, what they dream it could 
