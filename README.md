@@ -41,24 +41,26 @@ Pages bucket into **Strong (80-100)**, **Decent (60-79)**, **Weak (40-59)**, **I
 
 ### Prerequisites
 
-- [Screaming Frog SEO Spider](https://www.screamingfrog.co.uk/seo-spider/) **v24.0 or later** with a valid license. The v24 release introduced the native MCP server.
+- [Screaming Frog SEO Spider](https://www.screamingfrog.co.uk/seo-spider/) **v16 or later** installed locally. A paid license is recommended (the free tier caps crawls at 500 URLs).
 - [Claude Code](https://docs.claude.com/en/docs/agents-and-tools/claude-code/overview) installed.
-- Node.js 20+ (only if you use the community MCP fallback).
+- [`uv`](https://docs.astral.sh/uv/) installed (`brew install uv` on macOS, or see uv docs). The MCP server runs via `uvx`, which pulls a pinned Python at install time so the audit works regardless of your system Python.
 
 ### Clone
 
 ```bash
-git clone https://github.com/<your-username>/ai-search-auditor.git
+git clone https://github.com/Kpradof/ai-search-auditor.git
 cd ai-search-auditor
 ```
 
 ### Wire up the MCP server
 
-The repo ships with `.mcp.json` configured for the **macOS native v24+ MCP server**. If that's you, no edits needed.
+The audit uses [`bzsasson/screaming-frog-mcp`](https://github.com/bzsasson/screaming-frog-mcp), a community MCP server that wraps Screaming Frog's headless CLI. The repo ships with `.mcp.json` already configured for **macOS**. If that's you, no edits needed.
 
-**Windows**: copy `.mcp.json.windows-example` over `.mcp.json` and adjust the binary path if your install is non-default.
+**Windows**: copy `.mcp.json.windows-example` over `.mcp.json`.
 
-**Free tier / community server**: copy `.mcp.json.community-example` over `.mcp.json`. This uses the community MCP server which works without a SF license (but is subject to the 500-URL free-tier cap).
+**Linux**: copy `.mcp.json.linux-example` over `.mcp.json`.
+
+If your Screaming Frog install path differs from the default, edit `SF_CLI_PATH` in `.mcp.json`.
 
 Verify the MCP server is reachable:
 
@@ -66,7 +68,9 @@ Verify the MCP server is reachable:
 claude mcp list
 ```
 
-You should see `screaming-frog` in the output.
+You should see `screaming-frog` with a `✓ Connected` status.
+
+> **Important workflow note:** Screaming Frog uses a single-process database. **Close the Screaming Frog GUI before running an audit**. The MCP server cannot read crawl data while the GUI is open. The server will surface a clear error if you forget.
 
 ---
 
@@ -187,7 +191,7 @@ MIT. See [LICENSE](LICENSE).
 
 ## Credits
 
-- [Screaming Frog](https://www.screamingfrog.co.uk/) for shipping a native MCP server in v24.
+- [Screaming Frog](https://www.screamingfrog.co.uk/) for the SEO Spider crawler this whole audit is built on.
+- [bzsasson/screaming-frog-mcp](https://github.com/bzsasson/screaming-frog-mcp) for the community MCP server that wires Screaming Frog into Claude.
 - [llmstxt.org](https://llmstxt.org/) for the `llms.txt` spec.
 - [ai.robots.txt](https://github.com/ai-robots-txt/ai.robots.txt) for the AI crawler reference list.
-- The community MCP server forks: [bzsasson/screaming-frog-mcp](https://github.com/bzsasson/screaming-frog-mcp), [marykovziridze/screaming-frog-mcp](https://github.com/marykovziridze/screaming-frog-mcp).

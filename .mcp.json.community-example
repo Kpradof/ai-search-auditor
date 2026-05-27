@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "screaming-frog": {
-      "command": "npx",
-      "args": ["-y", "@marykovziridze/screaming-frog-mcp"],
-      "env": {}
-    }
-  }
-}

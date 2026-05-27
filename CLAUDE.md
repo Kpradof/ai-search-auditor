@@ -45,12 +45,16 @@ Plus the fix artifacts (always generated, even when minimal):
 
 ## MCP server selection
 
-`.mcp.json` ships configured for the **macOS native Screaming Frog v24+ MCP server** (requires SF license). Two alternates live next to it:
+`.mcp.json` ships configured to run [`bzsasson/screaming-frog-mcp`](https://github.com/bzsasson/screaming-frog-mcp) (a Python community MCP server that wraps SF's headless CLI) via `uvx --python 3.13`. The Python 3.13 pin avoids wheel-resolution failures on systems with bleeding-edge Python. macOS path is the default; alternates live next to it:
 
-- `.mcp.json.windows-example`: adjust binary path for Windows.
-- `.mcp.json.community-example`: community Node-based server, no SF license required, capped at 500 URLs by SF's free tier.
+- `.mcp.json.windows-example`: same server, Windows `SF_CLI_PATH`.
+- `.mcp.json.linux-example`: same server, Linux `SF_CLI_PATH`.
 
-User picks one by copying over `.mcp.json`. If `claude mcp list` does not show `screaming-frog`, stop and point them at README §Install. Do not try to scrape or browser-automate as a fallback (out of scope per CONTRIBUTING.md).
+User picks one by copying over `.mcp.json`. If `claude mcp list` does not show `screaming-frog` as `✓ Connected`, stop and point them at README §Install. Do not try to scrape or browser-automate as a fallback (out of scope per CONTRIBUTING.md).
+
+**Critical workflow constraint:** Screaming Frog's database is single-process. The SF GUI **must be closed** before any MCP tool is called; the MCP server will error out if it cannot acquire a DB lock. The skill's pre-flight check (see `SKILL.md` §Required setup) enforces this.
+
+> Note: Screaming Frog v24 was once reported to ship a native MCP server (`--mcp-server` flag). That flag is not present in v24.0.0 binaries tested. If a future SF release exposes a native MCP, swap `.mcp.json` accordingly.
 
 ## Conventions
 

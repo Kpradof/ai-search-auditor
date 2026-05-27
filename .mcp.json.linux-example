@@ -4,7 +4,7 @@
       "command": "uvx",
       "args": ["--python", "3.13", "--from", "screaming-frog-mcp", "screaming-frog-mcp"],
       "env": {
-        "SF_CLI_PATH": "C:\\Program Files (x86)\\Screaming Frog SEO Spider\\ScreamingFrogSEOSpiderCli.exe"
+        "SF_CLI_PATH": "/usr/bin/screamingfrogseospider"
       }
     }
   }

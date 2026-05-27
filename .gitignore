@@ -30,3 +30,6 @@ Thumbs.db
 
 # Personal / non-repo working files
 LINKEDIN_POST.md
+_post/
+.venv-sfmcp/
+.mcp.json.native-v24.bak

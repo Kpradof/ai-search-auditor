@@ -17,19 +17,21 @@ End-to-end audit of how citable a website is in generative search engines (ChatG
 
 ## Required setup
 
-Before running, the Screaming Frog MCP server must be configured and reachable. Verify by listing available MCP tools — you should see tools from the `screaming-frog` server (typically `crawl`, `export`, `get_crawl_data`, or similarly named).
+Before running, the Screaming Frog MCP server (via `bzsasson/screaming-frog-mcp`) must be configured and reachable. Verify by listing available MCP tools: you should see tools from the `screaming-frog` server (typically `crawl_site`, `list_crawls`, `export_data`, or similarly named).
 
-If the MCP server is not available, stop and direct the user to the setup steps in `README.md` of this repo (`.mcp.json` is checked in but the user must have Screaming Frog SEO Spider v24+ installed locally with a valid license).
+If the MCP server is not available, stop and direct the user to the setup steps in `README.md` (the user needs Screaming Frog SEO Spider v16+ installed locally and `uv` installed so `uvx` can fetch the MCP server).
+
+**Critical pre-flight check:** Screaming Frog's database is single-process. If the Screaming Frog GUI is open, the MCP server cannot read crawl data. Before invoking any MCP tool, confirm the SF GUI is closed. If a tool returns an error about the database being locked, stop and tell the user to quit Screaming Frog before retrying.
 
 ## The audit dimensions
 
-Five dimensions, each scored 0–20, total out of 100 per page and per site:
+Five dimensions, each scored 0-20, total out of 100 per page and per site:
 
-1. **Bot Access (0–20)** — robots.txt posture for GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Bytespider, CCBot, anthropic-ai, OAI-SearchBot, Applebot-Extended.
-2. **Discovery (0–20)** — presence + quality of `/llms.txt`, `/llms-full.txt`, sitemap.xml, RSS, canonical hygiene.
-3. **Structure (0–20)** — schema.org coverage (Article, FAQPage, HowTo, Product, Organization, Person, BreadcrumbList), heading hierarchy, semantic HTML.
-4. **Citability (0–20)** — content patterns that LLMs cite: definitive answers in the first 100 words, Q&A blocks, bulleted facts, named-entity density, author bylines, dates, citations to primary sources.
-5. **Authority Signals (0–20)** — explicit author/entity markup, About page presence, external citations to primary research, internal linking depth to "answer" pages.
+1. **Bot Access (0-20):** robots.txt posture for GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Bytespider, CCBot, anthropic-ai, OAI-SearchBot, Applebot-Extended.
+2. **Discovery (0-20):** presence + quality of `/llms.txt`, `/llms-full.txt`, sitemap.xml, RSS, canonical hygiene.
+3. **Structure (0-20):** schema.org coverage (Article, FAQPage, HowTo, Product, Organization, Person, BreadcrumbList), heading hierarchy, semantic HTML.
+4. **Citability (0-20):** content patterns that LLMs cite: definitive answers in the first 100 words, Q&A blocks, bulleted facts, named-entity density, author bylines, dates, citations to primary sources.
+5. **Authority Signals (0-20):** explicit author/entity markup, About page presence, external citations to primary research, internal linking depth to "answer" pages.
 
 Full per-dimension rubric in `.claude/skills/ai-search-audit/rubric.md`.
 
@@ -40,12 +42,12 @@ Full per-dimension rubric in `.claude/skills/ai-search-audit/rubric.md`.
 Ask the user (skip if already in request):
 - Target URL.
 - Crawl cap (default: 500 URLs).
-- JS rendering on/off (default: off — turn on for SPAs).
+- JS rendering on/off (default: off; turn on for SPAs).
 - Page-set focus: full site, blog only, product pages only, etc.
 
 ### 2. Pre-crawl checks (no crawl yet)
 
-Fetch the following root files directly before crawling — these inform the whole audit:
+Fetch the following root files directly before crawling; these inform the whole audit:
 - `https://<domain>/robots.txt`
 - `https://<domain>/llms.txt`
 - `https://<domain>/llms-full.txt`
@@ -80,10 +82,10 @@ For each indexable 200 URL, compute the five dimension scores per the rubric. St
 Per-page total = sum of dimension scores (max 100).
 
 Bucket pages:
-- **Strong (80–100)**: citation-ready as-is.
-- **Decent (60–79)**: minor fixes unlock citability.
-- **Weak (40–59)**: structural problems, needs rework.
-- **Invisible (0–39)**: LLMs will skip these.
+- **Strong (80-100):** citation-ready as-is.
+- **Decent (60-79):** minor fixes unlock citability.
+- **Weak (40-59):** structural problems, needs rework.
+- **Invisible (0-39):** LLMs will skip these.
 
 ### 6. Score the site
 
@@ -96,7 +98,7 @@ Site score = weighted aggregate:
 
 Always generate the following, even if empty/minimal:
 
-**A. `reports/<domain>/llms.txt`** — built from the crawl. Format per the llmstxt.org spec:
+**A. `reports/<domain>/llms.txt`:** built from the crawl. Format per the llmstxt.org spec:
 ```
 # <Site name>
 
@@ -108,11 +110,11 @@ Always generate the following, even if empty/minimal:
 ```
 Limit to top 50 pages by inlink count, grouped by URL path prefix.
 
-**B. `reports/<domain>/robots-ai-bots-patch.txt`** — robots.txt block to add/replace. If bots are blocked, generate the unblock patch. If allowed, generate verification snippet. Comment each bot with provenance link.
+**B. `reports/<domain>/robots-ai-bots-patch.txt`:** robots.txt block to add/replace. If bots are blocked, generate the unblock patch. If allowed, generate verification snippet. Comment each bot with provenance link.
 
-**C. `reports/<domain>/schema-patches/`** — one JSON-LD file per page that is missing a recommended schema type. Filename: URL slug + `.json`. Pre-populate with what can be inferred from crawl data; mark unknown fields with `"TODO: <human-readable note>"`.
+**C. `reports/<domain>/schema-patches/`:** one JSON-LD file per page that is missing a recommended schema type. Filename: URL slug + `.json`. Pre-populate with what can be inferred from crawl data; mark unknown fields with `"TODO: <human-readable note>"`.
 
-**D. `reports/<domain>/content-rewrite-recs.md`** — for each Weak/Invisible page in the top-50 by inlinks: specific restructuring recommendation. Format: current opening (quoted), problem (one line), suggested rewrite of first paragraph (Q&A or definitive-answer style).
+**D. `reports/<domain>/content-rewrite-recs.md`:** for each Weak/Invisible page in the top-50 by inlinks, write a specific restructuring recommendation. Format: current opening (quoted), problem (one line), suggested rewrite of first paragraph (Q&A or definitive-answer style).
 
 ### 8. Write the main report (markdown + HTML one-pager)
 
@@ -123,13 +125,13 @@ Two formats, same data, both written every run.
 `reports/<domain>/audit-<YYYY-MM-DD>.md`:
 
 ```markdown
-# AI Search Readiness Audit — <domain>
+# AI Search Readiness Audit: <domain>
 
 **Crawled:** <date> · **URLs crawled:** <n> · **JS rendering:** on/off
 **Site score:** <n>/100 · **Top-50 page average:** <n>/100
 
 ## Headline finding
-<one paragraph in plain English — what's the biggest unlock to becoming citable in ChatGPT/Claude/Perplexity?>
+<one paragraph in plain English. What's the biggest unlock to becoming citable in ChatGPT/Claude/Perplexity?>
 
 ## Score breakdown
 | Dimension | Score | What's blocking max |
@@ -141,14 +143,14 @@ Two formats, same data, both written every run.
 | Authority  | x/20 | ... |
 
 ## Top 5 fixes that move the needle
-1. <fix> — effort: S/M/L · expected score gain: +n
+1. <fix>. Effort: S/M/L · expected score gain: +n
 2. ...
 
 ## Page buckets
 - Strong: n pages (sample: ...)
 - Decent: n pages
 - Weak: n pages
-- Invisible: n pages (top inlink-count first — these are the priorities)
+- Invisible: n pages (top inlink-count first; these are the priorities)
 
 ## Generated artifacts
 - `llms.txt`: `reports/<domain>/llms.txt`
@@ -156,7 +158,7 @@ Two formats, same data, both written every run.
 - Schema patches: `reports/<domain>/schema-patches/` (<n> files)
 - Content rewrite recs: `reports/<domain>/content-rewrite-recs.md`
 
-## Appendix — full per-page scores
+## Appendix: full per-page scores
 <table>
 ```
 
@@ -177,13 +179,13 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 | `{{crawl_date}}` | ISO date of crawl |
 | `{{urls_crawled}}` | integer |
 | `{{js_rendering}}` | `"on"` or `"off"` |
-| `{{repo_owner}}` | GitHub user/org for branding link — read from `package.json` `repository` field or default to `ai-search-auditor` |
-| `{{site_score}}` | 0–100 integer |
-| `{{top50_avg}}` | 0–100 integer |
+| `{{repo_owner}}` | GitHub user/org for branding link. Read from `package.json` `repository` field or default to `ai-search-auditor`. |
+| `{{site_score}}` | 0-100 integer |
+| `{{top50_avg}}` | 0-100 integer |
 | `{{headline_finding_html}}` | HTML-escaped paragraph; wrap the single most important phrase in `<strong>...</strong>` |
-| `{{bot_access}}`, `{{discovery}}`, `{{structure}}`, `{{citability}}`, `{{authority}}` | each 0–20 |
-| `{{bot_access_pct}}` … `{{authority_pct}}` | same value × 5 (since max is 20) |
-| `{{bot_access_blocker}}` … `{{authority_blocker}}` | one-line blocker text, HTML-escaped |
+| `{{bot_access}}`, `{{discovery}}`, `{{structure}}`, `{{citability}}`, `{{authority}}` | each 0-20 |
+| `{{bot_access_pct}}` ... `{{authority_pct}}` | same value × 5 (since max is 20) |
+| `{{bot_access_blocker}}` ... `{{authority_blocker}}` | one-line blocker text, HTML-escaped |
 | `{{fixes_html}}` | five `.fix` divs, see template format below |
 | `{{bucket_strong}}`, `{{bucket_decent}}`, `{{bucket_weak}}`, `{{bucket_invisible}}` | page counts |
 | `{{priority_rows_html}}` | `<tr>` rows for top-10 invisible pages by inlink count |
@@ -209,9 +211,9 @@ Use class `s` / `m` / `l` on the `.pill` matching effort. Repeat for all five fi
   <td>{{top_miss}}</td>
 </tr>
 ```
-Class on `.score` cell: `bad` if <40, `warn` if 40–59, `good` if ≥60.
+Class on `.score` cell: `bad` if <40, `warn` if 40-59, `good` if >=60.
 
-**`.artifact` div format**:
+**`.artifact` div format:**
 ```html
 <div class="artifact">
   <div class="ico">TXT</div>
@@ -226,7 +228,7 @@ Icon labels: `TXT` for `.txt`, `MD` for `.md`, `JSN` for `.json`, `DIR` for dire
 
 Surface to chat:
 - Site score one-liner.
-- Path to **HTML one-pager** (`reports/<domain>/audit-<YYYY-MM-DD>.html`) — this is the shareable artifact, lead with it.
+- Path to **HTML one-pager** (`reports/<domain>/audit-<YYYY-MM-DD>.html`); this is the shareable artifact, lead with it.
 - Path to markdown report.
 - Single highest-leverage fix.
 - Offer: "Want me to open the HTML in your browser / apply the robots.txt patch / commit the llms.txt to the repo / open a PR with schema patches?"

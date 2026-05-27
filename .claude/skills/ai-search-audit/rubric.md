@@ -2,11 +2,11 @@
 
 Deterministic, auditable. No vibes. Every point traceable to a crawl observation.
 
-Each dimension scores 0–20. Five dimensions, total 100.
+Each dimension scores 0-20. Five dimensions, total 100.
 
 ---
 
-## 1. Bot Access (0–20) — site-level
+## 1. Bot Access (0-20): site-level
 
 Checks `robots.txt` posture for AI crawlers. Score is the count of AI bots **not blocked** (and not implicitly blocked via `User-agent: *` Disallow), capped at 20.
 
@@ -26,13 +26,13 @@ Bots checked (worth 2 points each, max 20):
 | `Applebot-Extended` | Apple | Apple Intelligence opt-in |
 
 Special cases:
-- Site has no `robots.txt`: score 20 (all bots implicitly allowed). Flag this in notes — it's permissive but not deliberate.
+- Site has no `robots.txt`: score 20 (all bots implicitly allowed). Flag this in notes; it's permissive but not deliberate.
 - Site `Disallow: /` to `User-agent: *` with no AI-bot-specific allows: score 0.
 - Site blocks bots explicitly but allows via specific User-agent block: score per-bot.
 
 ---
 
-## 2. Discovery (0–20) — site-level
+## 2. Discovery (0-20): site-level
 
 How easy is it for AI crawlers to discover and ingest your content?
 
@@ -49,7 +49,7 @@ Total max 20. Partial credit allowed (e.g. `llms.txt` exists but only lists home
 
 ---
 
-## 3. Structure (0–20) — per page, averaged for site
+## 3. Structure (0-20): per page, averaged for site
 
 Structured data and semantic HTML signals that help LLMs parse content.
 
@@ -67,7 +67,7 @@ Auto-zero this dimension if page is non-indexable.
 
 ---
 
-## 4. Citability (0–20) — per page
+## 4. Citability (0-20): per page
 
 Patterns LLMs preferentially cite. Based on observed citation behavior in published LLM-citation studies and our own pattern library.
 
@@ -84,7 +84,7 @@ Patterns LLMs preferentially cite. Based on observed citation behavior in publis
 
 ---
 
-## 5. Authority Signals (0–20) — per page (with site-level lift)
+## 5. Authority Signals (0-20): per page (with site-level lift)
 
 LLMs cite sources that look authoritative.
 
@@ -96,7 +96,7 @@ LLMs cite sources that look authoritative.
 | Page links to >=1 primary research / .gov / .edu / official spec | 3 |
 | Site Organization schema includes `sameAs` to LinkedIn/Wikipedia/Crunchbase | 3 |
 | Page has >=10 internal inlinks from other indexable pages | 3 |
-| Site has been linked from Wikipedia (manual check, optional — skip if not verifiable) | 3 |
+| Site has been linked from Wikipedia (manual check, optional; skip if not verifiable) | 3 |
 
 ---
 
@@ -104,10 +104,10 @@ LLMs cite sources that look authoritative.
 
 Per-page total = Structure + Citability + Authority (out of 60), plus site-wide Bot Access + Discovery (out of 40) added uniformly to every page.
 
-- **Strong**: 80–100
-- **Decent**: 60–79
-- **Weak**: 40–59
-- **Invisible**: 0–39
+- **Strong**: 80-100
+- **Decent**: 60-79
+- **Weak**: 40-59
+- **Invisible**: 0-39
 
 ---
 
@@ -121,4 +121,4 @@ When recommending fixes, estimate expected score gain conservatively:
 - Rewriting first paragraph to definitive-answer style: +5 (Citability, per page).
 - Adding author byline + Person schema: +6 (Authority + Structure, per page).
 
-These are tuning targets — actual gain on re-audit may differ ±20%.
+These are tuning targets. Actual gain on re-audit may differ +/- 20%.
