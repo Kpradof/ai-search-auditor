@@ -153,7 +153,7 @@
     </div>
     <div>
       <div style="font-size:11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Headline finding</div>
-      <p class="headline">{{headline_finding_html}}</p>
+      <p class="headline"><strong>{{headline_gap}}</strong> {{headline_consequence}} {{headline_action}}</p>
       <div style="margin-top: 14px; font-size: 13px; color: var(--ink-dim);">Top-50 most-linked pages average <strong style="color: var(--ink);">{{top50_avg}}/100</strong>.</div>
     </div>
   </div>
