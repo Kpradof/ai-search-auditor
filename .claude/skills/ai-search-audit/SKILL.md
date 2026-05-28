@@ -184,12 +184,13 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 |---|---|
 | `{{domain}}` | site domain |
 | `{{crawl_date}}` | ISO date of crawl |
+| `{{rubric_version}}` | rubric version string (read from `rubric.md` `rubric_version` frontmatter, e.g. `1.1.0`) |
 | `{{urls_crawled}}` | integer |
 | `{{js_rendering}}` | `"on"` or `"off"` |
 | `{{repo_owner}}` | GitHub user/org for branding link. Defaults to `Kpradof` (the repo owner). Override if you've forked the repo under a different account. |
 | `{{site_score}}` | 0-100 integer |
 | `{{top50_avg}}` | 0-100 integer |
-| `{{headline_finding_html}}` | HTML-escaped paragraph; wrap the single most important phrase in `<strong>...</strong>` |
+| `{{headline_finding_html}}` | Pre-built HTML fragment. Construct this as an HTML string (wrap the single most important phrase in `<strong>...</strong>`). Do **not** HTML-escape this token when substituting into the template — it is injected as raw HTML. HTML-escape any user-derived content *within* the fragment before building it. |
 | `{{bot_access}}`, `{{discovery}}`, `{{structure}}`, `{{citability}}`, `{{authority}}` | each 0-20 |
 | `{{bot_access_pct}}`, `{{discovery_pct}}`, `{{structure_pct}}`, `{{citability_pct}}`, `{{authority_pct}}` | same value × 5 (since max is 20) |
 | `{{bot_access_blocker}}`, `{{discovery_blocker}}`, `{{structure_blocker}}`, `{{citability_blocker}}`, `{{authority_blocker}}` | one-line blocker text, HTML-escaped |

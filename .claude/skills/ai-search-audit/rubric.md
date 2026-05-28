@@ -1,5 +1,7 @@
 # AI Search Readiness Scoring Rubric
 
+**rubric_version: 1.1.0**
+
 Deterministic, auditable. No vibes. Every point traceable to a crawl observation.
 
 Each dimension scores 0-20. Five dimensions, total 100.

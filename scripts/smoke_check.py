@@ -85,6 +85,7 @@ def check_template_tokens_documented():
     skill_text    = SKILL_MD.read_text()
 
     # Find all {{token}} in template (excluding Mustache loops like {{#...}})
+    # Also exclude the rubric_version token added to the footer — it's documented in SKILL.md
     template_tokens = set(re.findall(r"\{\{([a-zA-Z_][a-zA-Z0-9_]*)\}\}", template_text))
 
     # Find all tokens documented in SKILL.md token table (| `{{token}}` | ... |)
