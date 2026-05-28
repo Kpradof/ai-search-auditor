@@ -223,7 +223,7 @@
     Re-audit in 4 weeks after shipping the top fixes. Expected post-fix site score:
     <strong style="color: var(--ink);">{{expected_post_fix_score}}/100</strong>.
     <br>
-    Rubric: <a href="https://github.com/{{repo_owner}}/ai-search-auditor/blob/main/.claude/skills/ai-search-audit/rubric.md">deterministic, auditable</a>.
+    Rubric: <a href="https://github.com/{{repo_owner}}/ai-search-auditor/blob/main/.claude/skills/ai-search-audit/rubric.md">deterministic, auditable</a> · v{{rubric_version}}.
   </footer>
 
 </div>
