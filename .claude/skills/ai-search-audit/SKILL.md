@@ -143,7 +143,7 @@ Two formats, same data, both written every run.
 **Site score:** <n>/100 · **Top-50 page average:** <n>/100
 
 ## Headline finding
-<one paragraph in plain English. What is the single most impactful change to becoming citable in ChatGPT/Claude/Perplexity?>
+{{headline_gap}} {{headline_consequence}} {{headline_action}}
 
 ## Score breakdown
 | Dimension | Score | What's blocking max |
@@ -195,7 +195,9 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 | `{{repo_owner}}` | GitHub user/org for branding link. Defaults to `Kpradof` (the repo owner). Override if you've forked the repo under a different account. |
 | `{{site_score}}` | 0-100 integer |
 | `{{top50_avg}}` | 0-100 integer |
-| `{{headline_finding_html}}` | Pre-built HTML fragment. Build it as three sentences using this exact structure: (1) the single biggest gap as a concrete fact ("Zero of N pages carry JSON-LD schema."), (2) the consequence for AI search ("AI bots can access the site but have little structured content to cite."), (3) the top action as a specific file or fix ("Adding llms.txt and Organization schema to the homepage raises the site score by an estimated X points."). Wrap the key metric or fix name in `<strong>...</strong>`. Do not use marketing language. Do not inject free prose. Do **not** HTML-escape this token when substituting into the template -- it is injected as raw HTML. |
+| `{{headline_gap}}` | The single biggest gap as a plain fact. One sentence, no marketing words. HTML-escaped. Example: "Zero of 505 indexable pages carry JSON-LD schema." |
+| `{{headline_consequence}}` | The consequence of that gap for AI search. One sentence, no marketing words. HTML-escaped. Example: "AI bots can access the site but have almost no structured content to cite." |
+| `{{headline_action}}` | The top action with a specific estimated score gain. One sentence. HTML-escaped. Example: "Adding llms.txt and Organization schema to the homepage raises the site score by an estimated 12 points." |
 | `{{bot_access}}`, `{{discovery}}`, `{{structure}}`, `{{citability}}`, `{{authority}}` | each 0-20 |
 | `{{bot_access_pct}}`, `{{discovery_pct}}`, `{{structure_pct}}`, `{{citability_pct}}`, `{{authority_pct}}` | same value × 5 (since max is 20) |
 | `{{bot_access_blocker}}`, `{{discovery_blocker}}`, `{{structure_blocker}}`, `{{citability_blocker}}`, `{{authority_blocker}}` | one-line blocker text, HTML-escaped |
