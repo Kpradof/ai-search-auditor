@@ -54,7 +54,7 @@
     --size: 200px; --val: {{site_score}}; --max: 100;
     width: var(--size); height: var(--size); border-radius: 50%;
     background:
-      conic-gradient(var(--accent) calc(var(--val) * 1% * 3.6deg), var(--panel-2) 0);
+      conic-gradient(var(--accent) calc(var(--val) * 3.6deg), var(--panel-2) 0);
     display: grid; place-items: center; position: relative;
   }
   .gauge .ring::before {
