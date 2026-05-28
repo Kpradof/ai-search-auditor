@@ -211,6 +211,9 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 Use class `s` / `m` / `l` on the `.pill` matching effort. Repeat for all five fixes.
 
 **`<tr>` row format** for priority table:
+
+The priority table must show only pages with score **< 40 (Invisible bucket)**. If fewer than 10 pages are truly Invisible, show all of them and note the count. Do **not** substitute Weak pages into this table — the section heading says "Invisible pages" and mixing in Weak pages produces incorrect output.
+
 ```html
 <tr>
   <td><a href="{{url}}">{{path}}</a></td>
@@ -266,5 +269,5 @@ Surface to chat:
 - Always write artifacts to `reports/<domain>/`. Never dump full report into chat.
 - Chat response stays under ~15 lines: score, one-line headline, single top fix, file paths.
 - Every recommendation must reference a specific URL from the crawl. No invented examples.
-- Never use marketing language ("supercharge", "unlock the power of"). Plain, specific, actionable.
+- **Never use marketing language in any generated text — including the headline finding, fix descriptions, and content-rewrite-recs.** Banned words: "supercharge", "unlock", "unlock the power of", "game-changer", "revolutionize", "transform your". Use plain, specific, actionable language instead. Example: "Adding llms.txt is the single highest-leverage fix" not "Unlock your AI search potential with llms.txt".
 - If a dimension scores max already, say so and move on. No padding.
