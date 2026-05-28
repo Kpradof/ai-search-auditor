@@ -43,9 +43,20 @@ How easy is it for AI crawlers to discover and ingest your content?
 | `sitemap.xml` present and referenced in `robots.txt` | 4 |
 | Canonical URLs present on >95% of indexable pages | 3 |
 | RSS/Atom feed present | 2 |
-| HTML sitemap or clear hub pages (in nav) | 2 |
+| HTML sitemap reachable at `/sitemap` or `/sitemap.html`, or linked from footer | 2 |
 
-Total max 20. Partial credit allowed (e.g. `llms.txt` exists but only lists homepage: 3/6).
+Total max 20.
+
+**Partial credit rules — Discovery:**
+
+| Check | Full points | Partial | Zero |
+|---|---|---|---|
+| `/llms.txt` present and valid | 6 — present, valid format, lists >1 page section | 3 — present but only lists homepage or malformed | 0 — absent |
+| `/llms-full.txt` present | 3 | — (binary) | 0 |
+| `sitemap.xml` present and in `robots.txt` | 4 — present AND referenced in `robots.txt` Sitemap directive | 2 — present but not referenced in `robots.txt` | 0 — absent |
+| Canonical URLs on >95% of indexable pages | 3 | 1 — 50–95% coverage | 0 — <50% |
+| RSS/Atom feed present | 2 | — (binary) | 0 |
+| HTML sitemap or footer link | 2 | — (binary) | 0 |
 
 ---
 
@@ -96,7 +107,7 @@ LLMs cite sources that look authoritative.
 | Page links to >=1 primary research / .gov / .edu / official spec | 3 |
 | Site Organization schema includes `sameAs` to LinkedIn/Wikipedia/Crunchbase | 3 |
 | Page has >=10 internal inlinks from other indexable pages | 3 |
-| Site has been linked from Wikipedia (manual check, optional; skip if not verifiable) | 3 |
+| Site has been linked from Wikipedia (if computable from crawl backlink data; score 0 if not verifiable) | 3 |
 
 ---
 

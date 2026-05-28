@@ -2,7 +2,7 @@
 
 Find out whether ChatGPT, Claude, Perplexity, and Google AI Overviews will cite your site, and get a concrete, prioritized fix list to make sure they will.
 
-Powered by [Screaming Frog SEO Spider](https://www.screamingfrog.co.uk/seo-spider/) (via its native v24+ MCP server) and [Claude](https://claude.com/claude-code). Open source, deterministic scoring, no SaaS account, no API keys.
+Powered by [Screaming Frog SEO Spider](https://www.screamingfrog.co.uk/seo-spider/) (via the [`bzsasson/screaming-frog-mcp`](https://github.com/bzsasson/screaming-frog-mcp) community MCP server) and [Claude](https://claude.com/claude-code). Open source, deterministic scoring, no SaaS account, no API keys.
 
 ---
 
@@ -41,7 +41,7 @@ Pages bucket into **Strong (80-100)**, **Decent (60-79)**, **Weak (40-59)**, **I
 
 ### Prerequisites
 
-- [Screaming Frog SEO Spider](https://www.screamingfrog.co.uk/seo-spider/) **v16 or later** installed locally. A paid license is recommended (the free tier caps crawls at 500 URLs).
+- [Screaming Frog SEO Spider](https://www.screamingfrog.co.uk/seo-spider/) installed locally. Verified with **v16+**; a paid license is recommended (the free tier caps crawls at 500 URLs).
 - [Claude Code](https://docs.claude.com/en/docs/agents-and-tools/claude-code/overview) installed.
 - [`uv`](https://docs.astral.sh/uv/) installed (`brew install uv` on macOS, or see uv docs). The MCP server runs via `uvx`, which pulls a pinned Python at install time so the audit works regardless of your system Python.
 
@@ -201,7 +201,7 @@ Crawl happens locally. No site data leaves your machine except what you send to 
 - [ ] Comparison mode (your site vs N competitors)
 - [ ] Wayback Machine integration: track AI search readiness over time
 - [ ] GitHub Action: gate PRs on AI search readiness regression
-- [ ] HTML report renderer for stakeholder sharing
+- [x] HTML report renderer for stakeholder sharing
 - [ ] Citation tracking: measure actual citations in Perplexity / ChatGPT Search over time
 
 PRs welcome.

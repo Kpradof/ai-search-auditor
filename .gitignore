@@ -2,6 +2,8 @@
 reports/*
 !reports/.gitkeep
 !reports/example.com/
+# anthropic.com is committed as a real-world showcase audit. Exception granted intentionally.
+# See CONTRIBUTING.md §Example audits for the policy on committing real-domain reports.
 !reports/anthropic.com/
 
 # Screaming Frog crawl files
@@ -29,7 +31,7 @@ Thumbs.db
 # Claude Code session/local
 .claude/settings.local.json
 
-# Personal / non-repo working files
+# Personal / non-repo working files (move to .git/info/exclude for your own machine)
 LINKEDIN_POST.md
 _post/
 .venv-sfmcp/
