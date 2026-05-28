@@ -5,6 +5,11 @@ description: Audit a website for AI-search readiness (ChatGPT, Claude, Perplexit
 
 # AI Search Readiness Audit
 
+> **TWO HARD RULES — read before anything else:**
+>
+> 1. **Priority table = Invisible pages only (score < 40).** Never put Weak pages (40-59) in the priority table even if there are fewer than 10 Invisible pages. If there are 0 Invisible pages, say so explicitly and leave the table empty.
+> 2. **No marketing language anywhere.** Banned words in all generated text: "unlock", "supercharge", "game-changer", "revolutionize", "transform your". Use plain, specific language. Write "Adding llms.txt raises Discovery by 6 points" not "Unlock your AI search potential."
+
 End-to-end audit of how citable a website is in generative search engines (ChatGPT, Claude, Perplexity, Google AI Overviews, Gemini). Uses the Screaming Frog MCP server for crawl + extraction, applies a deterministic scoring rubric, generates fixes a developer can ship.
 
 ## When to use
