@@ -1,0 +1,36 @@
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "{{title}}",
+  "description": "{{meta_description}}",
+  "url": "{{url}}",
+  "totalTime": "TODO: ISO 8601 duration (e.g. PT30M for 30 minutes)",
+  "estimatedCost": {
+    "@type": "MonetaryAmount",
+    "currency": "USD",
+    "value": "TODO: cost or 0 if free"
+  },
+  "step": [
+    {
+      "@type": "HowToStep",
+      "name": "TODO: step 1 short title",
+      "text": "TODO: step 1 full instruction",
+      "position": 1
+    },
+    {
+      "@type": "HowToStep",
+      "name": "TODO: step 2 short title",
+      "text": "TODO: step 2 full instruction",
+      "position": 2
+    }
+  ],
+  "author": {
+    "@type": "Person",
+    "name": "TODO: author full name",
+    "url": "TODO: author profile URL"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{site_name}}"
+  }
+}
