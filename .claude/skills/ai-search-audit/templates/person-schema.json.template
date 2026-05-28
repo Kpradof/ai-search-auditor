@@ -1,0 +1,23 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "TODO: full name",
+  "url": "{{url}}",
+  "image": "TODO: absolute URL to headshot",
+  "jobTitle": "TODO: job title or role",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "{{site_name}}",
+    "url": "https://{{domain}}"
+  },
+  "description": "TODO: 1-2 sentence bio",
+  "sameAs": [
+    "TODO: LinkedIn profile URL",
+    "TODO: X / Twitter profile URL",
+    "TODO: personal site URL (if different from page URL)"
+  ],
+  "knowsAbout": [
+    "TODO: topic 1",
+    "TODO: topic 2"
+  ]
+}
