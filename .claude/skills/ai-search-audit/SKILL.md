@@ -5,9 +5,9 @@ description: Audit a website for AI-search readiness (ChatGPT, Claude, Perplexit
 
 # AI Search Readiness Audit
 
-> **TWO HARD RULES — read before anything else:**
+> **TWO HARD RULES -- read before anything else:**
 >
-> 1. **Priority table = Invisible pages only (score < 40).** Never put Weak pages (40-59) in the priority table even if there are fewer than 10 Invisible pages. If there are 0 Invisible pages, say so explicitly and leave the table empty.
+> 1. **Priority table = top 10 pages by inlink count with score < 60 (below Decent).** Always sort by inlinks descending within that filtered set. Never show pages with score >= 60 in this table.
 > 2. **No marketing language anywhere.** Banned words in all generated text: "unlock", "supercharge", "game-changer", "revolutionize", "transform your". Use plain, specific language. Write "Adding llms.txt raises Discovery by 6 points" not "Unlock your AI search potential."
 
 End-to-end audit of how citable a website is in generative search engines (ChatGPT, Claude, Perplexity, Google AI Overviews, Gemini). Uses the Screaming Frog MCP server for crawl + extraction, applies a deterministic scoring rubric, generates fixes a developer can ship.
@@ -195,7 +195,7 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 | `{{repo_owner}}` | GitHub user/org for branding link. Defaults to `Kpradof` (the repo owner). Override if you've forked the repo under a different account. |
 | `{{site_score}}` | 0-100 integer |
 | `{{top50_avg}}` | 0-100 integer |
-| `{{headline_finding_html}}` | Pre-built HTML fragment. Construct this as an HTML string (wrap the single most important phrase in `<strong>...</strong>`). Do **not** HTML-escape this token when substituting into the template — it is injected as raw HTML. HTML-escape any user-derived content *within* the fragment before building it. |
+| `{{headline_finding_html}}` | Pre-built HTML fragment. Build it as three sentences using this exact structure: (1) the single biggest gap as a concrete fact ("Zero of N pages carry JSON-LD schema."), (2) the consequence for AI search ("AI bots can access the site but have little structured content to cite."), (3) the top action as a specific file or fix ("Adding llms.txt and Organization schema to the homepage raises the site score by an estimated X points."). Wrap the key metric or fix name in `<strong>...</strong>`. Do not use marketing language. Do not inject free prose. Do **not** HTML-escape this token when substituting into the template -- it is injected as raw HTML. |
 | `{{bot_access}}`, `{{discovery}}`, `{{structure}}`, `{{citability}}`, `{{authority}}` | each 0-20 |
 | `{{bot_access_pct}}`, `{{discovery_pct}}`, `{{structure_pct}}`, `{{citability_pct}}`, `{{authority_pct}}` | same value × 5 (since max is 20) |
 | `{{bot_access_blocker}}`, `{{discovery_blocker}}`, `{{structure_blocker}}`, `{{citability_blocker}}`, `{{authority_blocker}}` | one-line blocker text, HTML-escaped |
@@ -217,7 +217,7 @@ Use class `s` / `m` / `l` on the `.pill` matching effort. Repeat for all five fi
 
 **`<tr>` row format** for priority table:
 
-The priority table must show only pages with score **< 40 (Invisible bucket)**. If fewer than 10 pages are truly Invisible, show all of them and note the count. Do **not** substitute Weak pages into this table — the section heading says "Invisible pages" and mixing in Weak pages produces incorrect output.
+The priority table shows the **top 10 pages by inlink count that score below Decent (< 60)**. This includes both Weak and Invisible pages and always surfaces the highest-traffic pages that need fixes -- which is what matters to clients. Sort by inlink count descending within that filtered set.
 
 ```html
 <tr>
