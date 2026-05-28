@@ -224,6 +224,11 @@
     <strong style="color: var(--ink);">{{expected_post_fix_score}}/100</strong>.
     <br>
     Rubric: <a href="https://github.com/{{repo_owner}}/ai-search-auditor/blob/main/.claude/skills/ai-search-audit/rubric.md">deterministic, auditable</a> · v{{rubric_version}}.
+    <br style="margin-bottom: 6px;">
+    <span style="font-size: 11px; color: var(--ink-dim); max-width: 700px; display: inline-block; margin-top: 8px; line-height: 1.5;">
+      Scope: optimized for citations in ChatGPT, Claude, and Perplexity.
+      For Google AI Overviews, <a href="https://developers.google.com/search/docs/fundamentals/ai-optimization-guide" style="color: var(--ink-dim);">Google's own guidance</a> prioritizes foundational SEO over llms.txt and structured data -- use Search Console for Google AI signals.
+    </span>
   </footer>
 
 </div>

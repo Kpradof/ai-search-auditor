@@ -35,6 +35,8 @@ Five dimensions, scored 0-20 each, total out of 100. Full rubric: [`.claude/skil
 
 Pages bucket into **Strong (80-100)**, **Decent (60-79)**, **Weak (40-59)**, **Invisible (0-39)**.
 
+> **Scope note:** This rubric is optimized for citations in **ChatGPT, Claude, and Perplexity** -- engines that actively use `llms.txt`, structured data, and explicit bot signals to decide what to index and cite. For **Google AI Overviews and AI Mode** specifically, [Google's own guidance](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide) prioritizes foundational SEO (crawlability, content quality, page experience) and explicitly marks `llms.txt` and structured data as non-required for AI features. That means a site scoring low here may still appear in Google AI Overviews if its core SEO is strong -- and vice versa. Use this audit for ChatGPT/Perplexity/Claude visibility; use Search Console and Core Web Vitals tooling for Google AI.
+
 ---
 
 ## Install
