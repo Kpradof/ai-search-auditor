@@ -207,7 +207,7 @@
   </section>
 
   <section class="card">
-    <h2>Priority fix list — Invisible pages (score &lt; 40) by inlink count</h2>
+    <h2>Priority fix list — top pages below Decent (&lt; 60) by inlink count</h2>
     <table>
       <thead><tr><th>URL</th><th>Inlinks</th><th>Score</th><th>Top miss</th></tr></thead>
       <tbody>{{priority_rows_html}}</tbody>

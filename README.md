@@ -198,7 +198,7 @@ Crawl happens locally. No site data leaves your machine except what you send to 
 
 ## Roadmap
 
-- [ ] Comparison mode (your site vs N competitors — partial: single-domain scope works; multi-domain side-by-side scorecard not yet built)
+- [ ] Comparison mode (your site vs N competitors; multi-domain side-by-side scorecard not yet built, single-domain scoping works today)
 - [ ] Wayback Machine integration: track AI search readiness over time
 - [ ] GitHub Action: gate PRs on AI search readiness regression
 - [x] HTML report renderer for stakeholder sharing
