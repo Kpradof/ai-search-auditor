@@ -277,6 +277,7 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 | `{{artifacts_html}}` | one `.artifact` div per generated file |
 | `{{orphan_count}}` | integer count of orphan pages (0 inlinks); used in the artifacts div label |
 | `{{delta_html}}` | score delta section HTML (see format below); empty string `""` if no prior audit exists |
+| `{{histogram_buckets_json}}` | JSON array of 10 objects, one per score decile, used by the histogram chart. Format: `[{"range":"0-9","count":0},{"range":"10-19","count":3},...]` covering ranges 0-9 through 90-100. Count = number of indexable pages whose total score falls in that range. |
 | `{{expected_post_fix_score}}` | integer estimate after top-5 fixes shipped |
 
 **`.fix` div format** (inject into `{{fixes_html}}`):
@@ -291,14 +292,11 @@ Use class `s` / `m` / `l` on the `.pill` matching effort. Repeat for all five fi
 
 **`<tr>` row format** for priority table:
 
-The priority table shows the **top 10 pages by inlink count that score below Decent (< 60)**. For each page, call `sf_get_url_screenshot` to get the stored screenshot and embed it as a base64 `data:image/png;base64,...` string. If SF has no screenshot for a URL (crawled without screenshot mode), omit the `<img>` and leave the cell empty.
+The priority table shows the **top 10 pages by inlink count that score below Decent (< 60)**. Sort by inlink count descending within that filtered set.
 
 ```html
 <tr>
-  <td>
-    <a href="{{url}}">{{path}}</a>
-    <div class="thumb"><img src="data:image/png;base64,{{screenshot_b64}}" alt="{{path}} screenshot" loading="lazy"></div>
-  </td>
+  <td><a href="{{url}}">{{path}}</a></td>
   <td>{{inlinks}}</td>
   <td class="score bad">{{score}}</td>
   <td>{{top_miss}}</td>
@@ -365,9 +363,6 @@ Surface to chat:
 
 **`sf_bulk_export_page_content` returns empty / no content records:**
 - "Store HTML" was not enabled before the crawl. Enable it under `Configuration > Spider > Extraction` (macOS) or `File > Settings > Spider > Extraction` (Windows/Linux), then re-crawl. Without it, Citability scoring and artifacts C, D, F, G are skipped.
-
-**Screenshots not appearing in priority table:**
-- Screenshots require a separate setting from "Store HTML". Enable "Store screenshots" under `Configuration > Spider > Advanced` before crawling. Re-crawl after enabling.
 
 **`sf_run_node_js_script` fails or returns empty:**
 - Node tools are disabled by default in SF. Enable via `File > Settings > MCP Server > Enable Node tools`. If you prefer not to enable it, run the scripts locally: `node scripts/<script>.js <args>` from the repo root.

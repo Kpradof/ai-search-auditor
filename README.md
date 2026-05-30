@@ -85,7 +85,6 @@ Four audit artifacts require page content stored during the crawl. Without this,
 Check the following:
 
 - **Store HTML** (required) — enables page content extraction for Citability scoring, readability, and FAQ gap detection.
-- **Store screenshots** (recommended) — enables page thumbnails in the HTML priority table. Find it under `Configuration > Spider > Advanced` (macOS) or `File > Settings > Spider > Advanced` (Windows/Linux).
 - **Generate page embeddings** (optional) — enables topic gap analysis. Requires an embeddings API key configured under `Configuration > Content > Embeddings`. Skip if you don't have one set up.
 
 These settings persist across crawls so you only need to do this once.

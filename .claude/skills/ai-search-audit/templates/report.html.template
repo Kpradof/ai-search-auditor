@@ -64,6 +64,12 @@
   .gauge .num small { font-size: 18px; color: var(--ink-dim); font-weight: 500; }
   .gauge .label { margin-top: 10px; color: var(--ink-dim); font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; }
 
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  @media (max-width: 760px) { .charts-row { grid-template-columns: 1fr; } }
+  .chart-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 24px; }
+  .chart-card h3 { font-size: 13px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 14px; font-weight: 600; }
+  .chart-card svg { display: block; width: 100%; }
+
   .headline { font-size: 17px; line-height: 1.55; }
   .headline strong { color: var(--accent-2); }
 
@@ -115,8 +121,6 @@
   table td.score.warn { color: var(--warn); }
   table td.score.good { color: var(--good); }
   table td a { color: var(--accent-2); text-decoration: none; word-break: break-all; }
-  .thumb { margin-top: 6px; }
-  .thumb img { max-width: 180px; max-height: 120px; border-radius: 6px; border: 1px solid var(--line); display: block; }
 
   .artifacts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   @media (max-width: 760px) { .artifacts { grid-template-columns: 1fr; } }
@@ -194,6 +198,158 @@
   </div>
 
   {{delta_html}}
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>Dimension radar</h3>
+      <svg id="radar" viewBox="0 0 240 220" aria-label="Radar chart of 5 audit dimensions"></svg>
+    </div>
+    <div class="chart-card">
+      <h3>Score distribution</h3>
+      <svg id="histogram" viewBox="0 0 340 200" aria-label="Histogram of page scores"></svg>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    var CS = getComputedStyle(document.documentElement);
+    var accent  = CS.getPropertyValue('--accent').trim()   || '#7c5cff';
+    var accent2 = CS.getPropertyValue('--accent-2').trim() || '#22d3ee';
+    var panel2  = CS.getPropertyValue('--panel-2').trim()  || '#161a23';
+    var ink     = CS.getPropertyValue('--ink').trim()      || '#e7ebf3';
+    var inkDim  = CS.getPropertyValue('--ink-dim').trim()  || '#9aa3b2';
+    var good    = CS.getPropertyValue('--good').trim()     || '#34d399';
+    var warn    = CS.getPropertyValue('--warn').trim()     || '#fbbf24';
+    var bad     = CS.getPropertyValue('--bad').trim()      || '#f87171';
+
+    // ── Radar chart ──────────────────────────────────────────────────────────
+    var dims = [
+      { label: 'Bot Access', val: {{bot_access}},  max: 20 },
+      { label: 'Discovery',  val: {{discovery}},   max: 20 },
+      { label: 'Structure',  val: {{structure}},   max: 20 },
+      { label: 'Citability', val: {{citability}},  max: 20 },
+      { label: 'Authority',  val: {{authority}},   max: 20 }
+    ];
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.getElementById('radar');
+    var cx = 120, cy = 112, r = 80;
+    var n = dims.length;
+    function polar(cx, cy, r, i, total) {
+      var angle = (Math.PI * 2 * i / total) - Math.PI / 2;
+      return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+    }
+    // Grid rings
+    [0.25, 0.5, 0.75, 1].forEach(function(pct) {
+      var pts = dims.map(function(_, i) { return polar(cx, cy, r * pct, i, n).join(','); }).join(' ');
+      var poly = document.createElementNS(ns, 'polygon');
+      poly.setAttribute('points', pts);
+      poly.setAttribute('fill', 'none');
+      poly.setAttribute('stroke', panel2);
+      poly.setAttribute('stroke-width', '1');
+      svg.appendChild(poly);
+    });
+    // Axis lines
+    dims.forEach(function(_, i) {
+      var pt = polar(cx, cy, r, i, n);
+      var line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+      line.setAttribute('x2', pt[0]); line.setAttribute('y2', pt[1]);
+      line.setAttribute('stroke', panel2); line.setAttribute('stroke-width', '1');
+      svg.appendChild(line);
+    });
+    // Data polygon
+    var dataPts = dims.map(function(d, i) {
+      return polar(cx, cy, r * (d.val / d.max), i, n).join(',');
+    }).join(' ');
+    var dataPoly = document.createElementNS(ns, 'polygon');
+    dataPoly.setAttribute('points', dataPts);
+    dataPoly.setAttribute('fill', accent);
+    dataPoly.setAttribute('fill-opacity', '0.2');
+    dataPoly.setAttribute('stroke', accent);
+    dataPoly.setAttribute('stroke-width', '2');
+    svg.appendChild(dataPoly);
+    // Dots
+    dims.forEach(function(d, i) {
+      var pt = polar(cx, cy, r * (d.val / d.max), i, n);
+      var circle = document.createElementNS(ns, 'circle');
+      circle.setAttribute('cx', pt[0]); circle.setAttribute('cy', pt[1]);
+      circle.setAttribute('r', '4');
+      circle.setAttribute('fill', accent2);
+      svg.appendChild(circle);
+    });
+    // Labels
+    dims.forEach(function(d, i) {
+      var pt = polar(cx, cy, r + 22, i, n);
+      var text = document.createElementNS(ns, 'text');
+      text.setAttribute('x', pt[0]); text.setAttribute('y', pt[1]);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dominant-baseline', 'middle');
+      text.setAttribute('font-size', '11');
+      text.setAttribute('fill', inkDim);
+      text.textContent = d.label + ' ' + d.val;
+      svg.appendChild(text);
+    });
+
+    // ── Histogram ────────────────────────────────────────────────────────────
+    var buckets = {{histogram_buckets_json}};
+    // buckets: array of {range:"0-9", count:N} for ranges 0-9,10-19,...,90-100
+    var hsvg = document.getElementById('histogram');
+    var hW = 340, hH = 200, padL = 28, padB = 36, padT = 12, padR = 12;
+    var chartW = hW - padL - padR;
+    var chartH = hH - padB - padT;
+    var maxCount = Math.max.apply(null, buckets.map(function(b) { return b.count; })) || 1;
+    var barW = chartW / buckets.length;
+    // Score color by range midpoint
+    function barColor(idx) {
+      var mid = idx * 10 + 5;
+      if (mid >= 80) return good;
+      if (mid >= 60) return accent2;
+      if (mid >= 40) return warn;
+      return bad;
+    }
+    buckets.forEach(function(b, i) {
+      var bh = Math.round((b.count / maxCount) * chartH);
+      var x = padL + i * barW + 2;
+      var y = padT + chartH - bh;
+      var rect = document.createElementNS(ns, 'rect');
+      rect.setAttribute('x', x);
+      rect.setAttribute('y', y);
+      rect.setAttribute('width', barW - 4);
+      rect.setAttribute('height', bh);
+      rect.setAttribute('fill', barColor(i));
+      rect.setAttribute('rx', '3');
+      hsvg.appendChild(rect);
+      // Count label on bar if space
+      if (bh > 16 && b.count > 0) {
+        var lbl = document.createElementNS(ns, 'text');
+        lbl.setAttribute('x', x + (barW - 4) / 2);
+        lbl.setAttribute('y', y + 11);
+        lbl.setAttribute('text-anchor', 'middle');
+        lbl.setAttribute('font-size', '9');
+        lbl.setAttribute('fill', '#fff');
+        lbl.textContent = b.count;
+        hsvg.appendChild(lbl);
+      }
+      // X axis label every 2 bars
+      if (i % 2 === 0) {
+        var xlabel = document.createElementNS(ns, 'text');
+        xlabel.setAttribute('x', x + (barW - 4) / 2);
+        xlabel.setAttribute('y', padT + chartH + 14);
+        xlabel.setAttribute('text-anchor', 'middle');
+        xlabel.setAttribute('font-size', '9');
+        xlabel.setAttribute('fill', inkDim);
+        xlabel.textContent = i * 10;
+        hsvg.appendChild(xlabel);
+      }
+    });
+    // Y axis baseline
+    var baseline = document.createElementNS(ns, 'line');
+    baseline.setAttribute('x1', padL); baseline.setAttribute('y1', padT + chartH);
+    baseline.setAttribute('x2', hW - padR); baseline.setAttribute('y2', padT + chartH);
+    baseline.setAttribute('stroke', panel2); baseline.setAttribute('stroke-width', '1');
+    hsvg.appendChild(baseline);
+  })();
+  </script>
 
   <section class="card">
     <h2>Top 5 fixes that move the needle</h2>
