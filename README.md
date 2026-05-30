@@ -174,7 +174,7 @@ The skill accepts these scoping inputs in your prompt:
 - `Audit only the /blog section of example.com`
 - `Audit example.com with JS rendering on` (for SPAs)
 - `Audit example.com, cap at 100 URLs`
-- `Audit example.com vs anthropic.com` (comparison mode, runs both, side-by-side scorecard)
+- `Audit example.com vs company-example.com` (comparison mode, runs both, side-by-side scorecard)
 
 ---
 
