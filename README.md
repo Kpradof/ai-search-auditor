@@ -149,7 +149,7 @@ Calibrated against a real run in May 2026 (Claude Opus 4.7 with prompt caching e
 
 | Site | URLs crawled | Pages scored | Wall time | API cost |
 |---|---|---|---|---|
-| anthropic.com | 4,042 | 352 | 31 min | $3.94 |
+| example-company.com | 4,042 | 352 | 31 min | $3.94 |
 
 **Typical audit cost: ~$3 to $6 USD per run** for sites with 300 to 500 indexable pages. Most input tokens are template + rubric + skill context, all cache-hittable across the audit's many tool calls, so the cache-read price ($1.50/M) dominates over the full input price.
 
