@@ -75,6 +75,28 @@ You should see `seospider` with a `✓ Connected` status.
 
 > **MCP server mode:** This repo uses **Streamable HTTP mode** (SF UI stays open, data visible in real time). If you prefer STDIO mode (headless, no UI), see the [Screaming Frog MCP docs](https://www.screamingfrog.co.uk/guides/mcp-server/) for the Claude Desktop extension setup — note that STDIO mode is Claude Desktop only and requires a different `.mcp.json` format.
 
+### Configure SF extraction settings
+
+Four audit artifacts require page content stored during the crawl. Without this, Citability scoring and the content-rewrite, readability, FAQ-gap, and topic-gap artifacts will be skipped.
+
+**macOS:** `Configuration > Spider > Extraction`
+**Windows/Linux:** `File > Settings > Spider > Extraction`
+
+Check the following:
+
+- **Store HTML** (required) — enables page content extraction for Citability scoring, readability, and FAQ gap detection.
+- **Generate page embeddings** (optional) — enables topic gap analysis. Requires an embeddings API key configured under `Configuration > Content > Embeddings`. Skip if you don't have one set up.
+
+These settings persist across crawls so you only need to do this once.
+
+### Enable Node tools (optional)
+
+The Node.js runtime inside SF powers the FAQ gap, readability, and topic gap scripts. It is disabled by default.
+
+`File > Settings > MCP Server > Enable Node tools`
+
+If you skip this, the scripts fall back to running locally via bash (`node scripts/<script>.js`) — Node.js must be installed on your machine in that case.
+
 ---
 
 ## Quickstart
