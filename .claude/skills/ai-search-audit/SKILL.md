@@ -248,11 +248,14 @@ Use class `s` / `m` / `l` on the `.pill` matching effort. Repeat for all five fi
 
 **`<tr>` row format** for priority table:
 
-The priority table shows the **top 10 pages by inlink count that score below Decent (< 60)**. This includes both Weak and Invisible pages and always surfaces the highest-traffic pages that need fixes -- which is what matters to clients. Sort by inlink count descending within that filtered set.
+The priority table shows the **top 10 pages by inlink count that score below Decent (< 60)**. For each page, call `sf_get_url_screenshot` to get the stored screenshot and embed it as a base64 `data:image/png;base64,...` string. If SF has no screenshot for a URL (crawled without screenshot mode), omit the `<img>` and leave the cell empty.
 
 ```html
 <tr>
-  <td><a href="{{url}}">{{path}}</a></td>
+  <td>
+    <a href="{{url}}">{{path}}</a>
+    <div class="thumb"><img src="data:image/png;base64,{{screenshot_b64}}" alt="{{path}} screenshot" loading="lazy"></div>
+  </td>
   <td>{{inlinks}}</td>
   <td class="score bad">{{score}}</td>
   <td>{{top_miss}}</td>
