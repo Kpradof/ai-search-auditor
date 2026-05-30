@@ -163,6 +163,14 @@ Skip this artifact (write empty file with note) if 0 orphan pages found.
 
 Pages in this list should also get FAQPage schema patches generated in artifact C.
 
+**G. `reports/<domain>/readability-scores.md`:** Flesch-Kincaid Reading Ease per page. Dense prose (score < 50) is harder for LLMs to cite verbatim. Run via `sf_run_node_js_script`:
+
+1. Write `scripts/readability-score.js` to the SF allowed directory via `sf_write_text_file`.
+2. Call `sf_run_node_js_script` with args `[<content_ndjson_path>, <output_md_path>]`. No npm install needed -- the script uses only Node built-ins.
+3. Read back and save to `reports/<domain>/readability-scores.md`.
+
+The script outputs site average FK score and a priority list of pages scoring below 50. Include the site average FK score as a one-line stat in the main report's Score breakdown section.
+
 ### 8. Write the main report (markdown + HTML one-pager)
 
 Two formats, same data, both written every run.
@@ -206,6 +214,7 @@ Two formats, same data, both written every run.
 - Content rewrite recs: `reports/<domain>/content-rewrite-recs.md`
 - Orphan pages: `reports/<domain>/orphan-pages.md` (<n> pages with 0 inlinks)
 - FAQ schema gaps: `reports/<domain>/faq-gap-pages.md` (<n> pages)
+- Readability scores: `reports/<domain>/readability-scores.md` (site avg FK: <n>)
 
 ## Appendix: full per-page scores
 <table>
