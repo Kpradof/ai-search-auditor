@@ -193,6 +193,8 @@
     </div>
   </div>
 
+  {{delta_html}}
+
   <section class="card">
     <h2>Top 5 fixes that move the needle</h2>
     <div class="fixes">{{fixes_html}}</div>
