@@ -271,7 +271,8 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 | `{{bot_access}}`, `{{discovery}}`, `{{structure}}`, `{{citability}}`, `{{authority}}` | each 0-20 |
 | `{{bot_access_pct}}`, `{{discovery_pct}}`, `{{structure_pct}}`, `{{citability_pct}}`, `{{authority_pct}}` | same value × 5 (since max is 20) |
 | `{{bot_access_blocker}}`, `{{discovery_blocker}}`, `{{structure_blocker}}`, `{{citability_blocker}}`, `{{authority_blocker}}` | one-line blocker text, HTML-escaped |
-| `{{fixes_html}}` | five `.fix` divs, see template format below |
+| `{{fixes_html}}` | five `.fix` divs separated by `.fix-label` divs (see format below) |
+| `{{matrix_html}}` | rows for the fix priority matrix (see format below) |
 | `{{bucket_strong}}`, `{{bucket_decent}}`, `{{bucket_weak}}`, `{{bucket_invisible}}` | page counts |
 | `{{priority_rows_html}}` | `<tr>` rows for top-10 invisible pages by inlink count |
 | `{{artifacts_html}}` | one `.artifact` div per generated file |
@@ -279,15 +280,39 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 | `{{delta_html}}` | score delta section HTML (see format below); empty string `""` if no prior audit exists |
 | `{{expected_post_fix_score}}` | integer estimate after top-5 fixes shipped |
 
-**`.fix` div format** (inject into `{{fixes_html}}`):
+**`{{fixes_html}}` format** -- separate Quick wins (S effort) from Strategic fixes (M/L effort) with a `.fix-label` divider:
 ```html
+<div class="fix-label quick">Quick wins -- ship this week</div>
 <div class="fix">
   <div class="rank">1</div>
   <div class="text">Publish <code>llms.txt</code> at the site root. Generated file at <code>reports/example.com/llms.txt</code> is deploy-ready.</div>
   <div class="meta"><span class="pill s">S</span> · +6 pts</div>
 </div>
+<div class="fix-label strategic">Strategic fixes -- next sprint or quarter</div>
+<div class="fix">
+  <div class="rank">2</div>
+  <div class="text">Add Article schema to all blog posts.</div>
+  <div class="meta"><span class="pill m">M</span> · +5 pts</div>
+</div>
 ```
-Use class `s` / `m` / `l` on the `.pill` matching effort. Repeat for all five fixes.
+Only include a label when the effort tier changes. If all fixes are the same tier, omit the labels.
+
+**`{{matrix_html}}` format** -- three rows (High / Med / Low impact). Place each fix as a numbered chip in the cell matching effort (S/M/L) and impact (+pts >= 5 = High, +3-4 = Med, +1-2 = Low). Chip number matches fix rank.
+```html
+<div class="matrix-row-hdr">High</div>
+<div class="matrix-cell"><span class="mx-chip s">1</span></div>
+<div class="matrix-cell"><span class="mx-chip m">2</span><span class="mx-chip m">3</span></div>
+<div class="matrix-cell"></div>
+<div class="matrix-row-hdr">Med</div>
+<div class="matrix-cell"><span class="mx-chip s">4</span></div>
+<div class="matrix-cell"></div>
+<div class="matrix-cell"><span class="mx-chip l">5</span></div>
+<div class="matrix-row-hdr">Low</div>
+<div class="matrix-cell"></div>
+<div class="matrix-cell"></div>
+<div class="matrix-cell"></div>
+```
+Chip color class matches effort: `s` = green, `m` = yellow, `l` = red.
 
 **`<tr>` row format** for priority table:
 
