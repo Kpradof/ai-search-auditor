@@ -281,7 +281,7 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 | `{{progress_html}}` | "Progress since last audit" card HTML (see format below); empty string `""` if no prior audit exists |
 | `{{expected_post_fix_score}}` | integer estimate after top-5 fixes shipped |
 
-**`{{fixes_html}}` format** -- separate Quick wins (S effort) from Strategic fixes (M/L effort) with a `.fix-group-label` divider:
+**`{{fixes_html}}` format** -- use `.fix-row` (not `.fix`). Separate Quick wins (S effort) from Strategic fixes (M/L effort) with a `.fix-group-label` divider:
 ```html
 <div class="fix-group-label quick">Quick wins -- ship this week</div>
 <div class="fix-row">
@@ -313,7 +313,7 @@ Only include a label when the effort tier changes. If all fixes are the same tie
 ```
 Score cell class: `bad` if <40, `warn` if 40-59, `good` if >=60. Truncate URLs longer than 30 chars with `...` in display. Word count and H1 come from the Internal and H1 exports -- do not invent them.
 
-**`{{progress_html}}` format** -- only inject when a prior audit exists. Three highlight cards showing the biggest wins:
+**`{{progress_html}}` format** -- only inject when a prior audit exists. Use the `.progress-grid` with three `.progress-item` cards (not a table). Three highlight cards showing the biggest wins:
 ```html
 <section class="card">
   <h2>Progress since last audit</h2>
