@@ -22,18 +22,23 @@ End-to-end audit of how citable a website is in generative search engines (ChatG
 
 ## Required setup
 
-Before running, the Screaming Frog MCP server (via `bzsasson/screaming-frog-mcp`) must be configured and reachable. Verify by listing available MCP tools: you should see the following tools from the `screaming-frog` server:
+Before running, the Screaming Frog SEO Spider MCP server (built into SF v24+) must be running. It exposes a Streamable HTTP server on `http://localhost:11435/mcp`. Verify by listing available MCP tools: you should see tools prefixed with `sf_` from the `seospider` server, including:
 
-- `crawl_site` — start a crawl with a given URL and config options
-- `list_crawls` — list previously completed crawls available for export
-- `export_crawl_data` — export a specific data report (Internal, Structured Data, etc.) from a completed crawl
-- `get_crawl_status` — check progress of a running crawl
+- `sf_crawl` — start a crawl with a given URL and optional config path
+- `sf_list_crawls` — list recent crawl jobs
+- `sf_crawl_progress` — check progress of a running crawl
+- `sf_generate_bulk_export` — export a data report (Internal, Structured Data, etc.)
+- `sf_export_seo_element_urls` — export URLs and data for a specific SEO element (H1, H2, titles, schema, etc.)
+- `sf_bulk_export_page_content` — bulk-export full page content in NDJSON format (use for citability analysis)
+- `sf_url_info` — detailed JSON report for a single URL
+- `sf_url_links` — inlinks or outlinks for a URL (use for inlink count per page)
+- `sf_list_available_bulk_exports` — list all available bulk export categories
 
-If the tool names differ in your installation, run `claude mcp list` and check the screaming-frog server tools directly.
+If tools are not visible, run `claude mcp list` and verify `seospider` appears as connected.
 
-If the MCP server is not available, stop and direct the user to the setup steps in `README.md` (the user needs Screaming Frog SEO Spider installed locally and `uv` installed so `uvx` can fetch the MCP server).
+If the MCP server is not available, stop and direct the user to the setup steps in `README.md`. The user needs Screaming Frog SEO Spider v24+ installed and the MCP server started via the SF menu (`MCP > Start MCP Server`) or via `File > Settings > MCP Server`.
 
-**Critical pre-flight check:** Screaming Frog's database is single-process. If the Screaming Frog GUI is open, the MCP server cannot read crawl data. Before invoking any MCP tool, confirm the SF GUI is closed. If a tool returns an error about the database being locked, stop and tell the user to quit Screaming Frog before retrying.
+**Critical pre-flight check:** Start the MCP server from within the SF UI (`MCP > Start MCP Server`) or enable auto-start in `File > Settings > MCP Server`. The server URL will show as `http://localhost:11435/mcp` in the SF status bar. If a tool call returns a connection error, confirm the server is running before retrying.
 
 ## The audit dimensions
 
@@ -69,23 +74,23 @@ Record presence + content. The Bot Access and Discovery scores partly derive fro
 
 ### 3. Run crawl via Screaming Frog MCP
 
-Call the Screaming Frog MCP `crawl` tool with the agreed parameters. Configure custom extractions where possible to grab:
-- All schema.org JSON-LD blocks (full content).
-- First 200 words of `main` / `article` content (for citability analysis).
-- `<meta name="author">`, `<meta property="article:author">`.
-- All `<h1>`, `<h2>`, `<h3>` text.
-- `og:type`, `og:title`, `og:description`.
+Call `sf_crawl` with the agreed parameters (start URL, optional crawl cap via config). Wait for completion by polling `sf_crawl_progress` until status is complete.
 
-Wait for crawl completion.
+The official MCP handles custom extractions natively via the export tools — no manual extraction config needed.
 
 ### 4. Pull exports
 
-From the MCP server, pull:
-- Internal: All (status, indexability, word count, response time).
-- Structured Data: All (with full JSON-LD blocks).
-- Page Titles, Meta Descriptions, H1, H2.
-- Canonicals.
-- Custom Extraction results.
+Use the official MCP tools to pull all data needed for scoring:
+
+- `sf_generate_bulk_export` with category `"Internal"` — all crawled URLs with status, indexability, word count, response time.
+- `sf_export_seo_element_urls` with `seo_element_name="Structured Data"` — JSON-LD blocks per page.
+- `sf_export_seo_element_urls` with `seo_element_name="H1"` — H1 text per URL.
+- `sf_export_seo_element_urls` with `seo_element_name="H2"` — H2 text per URL.
+- `sf_export_seo_element_urls` with `seo_element_name="Page Titles"` — title tags.
+- `sf_export_seo_element_urls` with `seo_element_name="Meta Description"` — meta descriptions.
+- `sf_export_seo_element_urls` with `seo_element_name="Canonicals"` — canonical URL per page.
+- `sf_bulk_export_page_content` — full page text in NDJSON format; use for citability analysis (first 200 words, Q&A blocks, named entities, author bylines, dates, external links).
+- `sf_url_links` with `links_direction="inlinks"` for each page in the top-50 by estimated traffic — use to build the inlink count table needed for priority sorting and site score weighting.
 
 ### 5. Score per page
 
@@ -257,19 +262,17 @@ Surface to chat:
 - The site may require JS rendering (SPA). Ask the user and re-run with JS rendering on.
 - Check if the crawl hit a login wall or bot-blocking redirect. Inspect the first few response codes in the Internal export.
 
-**MCP database locked error:**
-- The Screaming Frog GUI is open. Tell the user to quit the application completely (not just minimize) and retry.
+**MCP connection error / tools not visible:**
+- Confirm the SF MCP server is running: open SF, go to `MCP > Start MCP Server`. The status bar should show `http://localhost:11435/mcp`.
+- Verify `.mcp.json` in the repo root points to `http://localhost:11435/mcp` and the server key is `seospider`.
+- Run `claude mcp list` and confirm `seospider` shows `✓ Connected`.
+- If auto-start is off, the server must be re-started manually each SF session (`File > Settings > MCP Server` to enable auto-start).
 
 **Partial crawl / crawl stopped early:**
 - SF's free tier caps at 500 URLs. Check if a paid license is configured. If capped, note it in the report and proceed with the URLs crawled.
 
 **Site returns 403 / auth-gated pages:**
-- Configure SF Basic Auth or cookie-based authentication in Screaming Frog settings before invoking the MCP crawl. Document which pages were excluded.
-
-**screaming-frog server not showing in `claude mcp list`:**
-- Verify `uv` is installed and `uvx` is on PATH.
-- Confirm `.mcp.json` exists in the repo root and `SF_CLI_PATH` points to the correct binary for the user's OS (see `.mcp.json.windows-example` and `.mcp.json.linux-example`).
-- Run `uvx --python 3.13 --from screaming-frog-mcp screaming-frog-mcp` in a terminal to check for install errors.
+- Configure SF Basic Auth or cookie-based authentication in Screaming Frog settings before invoking `sf_crawl`. Document which pages were excluded.
 
 ## Output rules
 

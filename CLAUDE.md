@@ -45,16 +45,20 @@ Plus the fix artifacts (always generated, even when minimal):
 
 ## MCP server selection
 
-`.mcp.json` ships configured to run [`bzsasson/screaming-frog-mcp`](https://github.com/bzsasson/screaming-frog-mcp) (a Python community MCP server that wraps SF's headless CLI) via `uvx --python 3.13`. The Python 3.13 pin avoids wheel-resolution failures on systems with bleeding-edge Python. macOS path is the default; alternates live next to it:
+`.mcp.json` is configured to connect to the **official Screaming Frog SEO Spider MCP server** (built into SF v24+), which runs as a Streamable HTTP server at `http://localhost:11435/mcp`. The server key is `seospider`.
 
-- `.mcp.json.windows-example`: same server, Windows `SF_CLI_PATH`.
-- `.mcp.json.linux-example`: same server, Linux `SF_CLI_PATH`.
+To use it: open SF, then `MCP > Start MCP Server`. Enable auto-start under `File > Settings > MCP Server` if preferred.
 
-User picks one by copying over `.mcp.json`. If `claude mcp list` does not show `screaming-frog` as `✓ Connected`, stop and point them at README §Install. Do not try to scrape or browser-automate as a fallback (out of scope per CONTRIBUTING.md).
+See the [official MCP docs](https://www.screamingfrog.co.uk/guides/mcp-server/) for STDIO mode setup (Claude Desktop extension) if you prefer a headless workflow.
 
-**Critical workflow constraint:** Screaming Frog's database is single-process. The SF GUI **must be closed** before any MCP tool is called; the MCP server will error out if it cannot acquire a DB lock. The skill's pre-flight check (see `SKILL.md` §Required setup) enforces this.
+**Key tools used by the audit skill:**
+- `sf_crawl` / `sf_crawl_progress` — start and monitor crawls
+- `sf_generate_bulk_export` / `sf_export_seo_element_urls` — pull structured data, titles, H1/H2, canonicals
+- `sf_bulk_export_page_content` — full page text for citability analysis
+- `sf_url_links` — inlink counts for priority table and site score weighting
+- `sf_url_info` — per-URL detailed report
 
-> Note: Screaming Frog v24 was once reported to ship a native MCP server (`--mcp-server` flag). That flag is not present in v24.0.0 binaries tested. If a future SF release exposes a native MCP, swap `.mcp.json` accordingly.
+If `claude mcp list` does not show `seospider` as `✓ Connected`, stop and point the user at README §Install. Do not try to scrape or browser-automate as a fallback (out of scope per CONTRIBUTING.md).
 
 ## Conventions
 
