@@ -172,6 +172,15 @@ Pages in this list should also get FAQPage schema patches generated in artifact 
 
 The script outputs site average FK score and a priority list of pages scoring below 50. Include the site average FK score as a one-line stat in the main report's Score breakdown section.
 
+**H. `reports/<domain>/topic-gap.md`:** topic cluster analysis using page embeddings. Identifies thin coverage areas (< 3 pages on same topic) where the site lacks authority. Useful for content strategy beyond fixing existing pages. Run via `sf_run_node_js_script`:
+
+1. Call `sf_export_embeddings` with a file path to save the CSV.
+2. Write `scripts/topic-gap.js` via `sf_write_text_file`.
+3. Call `sf_run_node_js_script` with args `[<embeddings_csv_path>, <titles_ndjson_path>, <output_md_path>]`.
+4. Read back and save to `reports/<domain>/topic-gap.md`.
+
+Note: `sf_export_embeddings` requires the crawl to have been run with the Screaming Frog embeddings feature enabled (`File > Settings > Content > Embeddings`). If embeddings are not available, skip this artifact and note it in the report.
+
 ### 8. Write the main report (markdown + HTML one-pager)
 
 Two formats, same data, both written every run.
@@ -227,6 +236,7 @@ Only include this section if a prior audit exists for the domain.
 - Orphan pages: `reports/<domain>/orphan-pages.md` (<n> pages with 0 inlinks)
 - FAQ schema gaps: `reports/<domain>/faq-gap-pages.md` (<n> pages)
 - Readability scores: `reports/<domain>/readability-scores.md` (site avg FK: <n>)
+- Topic gap analysis: `reports/<domain>/topic-gap.md` (<n> thin clusters)
 
 ## Appendix: full per-page scores
 <table>
