@@ -271,24 +271,72 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 | `{{bot_access}}`, `{{discovery}}`, `{{structure}}`, `{{citability}}`, `{{authority}}` | each 0-20 |
 | `{{bot_access_pct}}`, `{{discovery_pct}}`, `{{structure_pct}}`, `{{citability_pct}}`, `{{authority_pct}}` | same value × 5 (since max is 20) |
 | `{{bot_access_blocker}}`, `{{discovery_blocker}}`, `{{structure_blocker}}`, `{{citability_blocker}}`, `{{authority_blocker}}` | one-line blocker text, HTML-escaped |
-| `{{fixes_html}}` | five `.fix` divs, see template format below |
+| `{{fixes_html}}` | five `.fix-row` divs separated by `.fix-group-label` divs (see format below) |
+| `{{working_plan_html}}` | `<tr>` rows for the page-level working plan table (see format below) |
 | `{{bucket_strong}}`, `{{bucket_decent}}`, `{{bucket_weak}}`, `{{bucket_invisible}}` | page counts |
-| `{{priority_rows_html}}` | `<tr>` rows for top-10 invisible pages by inlink count |
+| `{{priority_rows_html}}` | `<tr>` rows for top-10 pages below Decent by inlink count (used in markdown report only) |
 | `{{artifacts_html}}` | one `.artifact` div per generated file |
 | `{{orphan_count}}` | integer count of orphan pages (0 inlinks); used in the artifacts div label |
-| `{{delta_html}}` | score delta section HTML (see format below); empty string `""` if no prior audit exists |
-| `{{histogram_buckets_json}}` | JSON array of 10 objects, one per score decile, used by the histogram chart. Format: `[{"range":"0-9","count":0},{"range":"10-19","count":3},...]` covering ranges 0-9 through 90-100. Count = number of indexable pages whose total score falls in that range. |
+| `{{prev_score}}` | site score from the most recent prior audit; use `--` if no prior audit exists |
+| `{{progress_html}}` | "Progress since last audit" card HTML (see format below); empty string `""` if no prior audit exists |
 | `{{expected_post_fix_score}}` | integer estimate after top-5 fixes shipped |
 
-**`.fix` div format** (inject into `{{fixes_html}}`):
+**`{{fixes_html}}` format** -- separate Quick wins (S effort) from Strategic fixes (M/L effort) with a `.fix-group-label` divider:
 ```html
-<div class="fix">
+<div class="fix-group-label quick">Quick wins -- ship this week</div>
+<div class="fix-row">
   <div class="rank">1</div>
-  <div class="text">Publish <code>llms.txt</code> at the site root. Generated file at <code>reports/example.com/llms.txt</code> is deploy-ready.</div>
-  <div class="meta"><span class="pill s">S</span> · +6 pts</div>
+  <div class="fix-text">Publish <code>llms.txt</code> at the site root. Generated file at <code>reports/example.com/llms.txt</code> is deploy-ready.</div>
+  <div class="fix-meta"><span class="pill s">S</span><span style="color:var(--accent-2);font-weight:700;">+6 pts</span></div>
+</div>
+<div class="fix-group-label strategic">Strategic fixes -- next sprint or quarter</div>
+<div class="fix-row">
+  <div class="rank">2</div>
+  <div class="fix-text">Add Article schema to all blog posts.</div>
+  <div class="fix-meta"><span class="pill m">M</span><span style="color:var(--accent-2);font-weight:700;">+5 pts</span></div>
 </div>
 ```
-Use class `s` / `m` / `l` on the `.pill` matching effort. Repeat for all five fixes.
+Only include a label when the effort tier changes. If all fixes are the same tier, omit the labels.
+
+**`{{working_plan_html}}` format** -- one `<tr>` per page, top 10 pages below Decent (< 60) by inlink count. Include H1, word count from Internal export, score, problem, specific how-to-fix instruction, effort badge, and points:
+```html
+<tr>
+  <td class="url-cell"><a href="{{url}}">{{short_path}}</a></td>
+  <td class="h1-cell">{{h1}}</td>
+  <td class="num-cell">{{word_count}}</td>
+  <td class="score-cell warn">{{score}}</td>
+  <td class="problem-cell">{{one_line_problem}}</td>
+  <td class="fix-cell">{{specific_how_to_fix}}</td>
+  <td><span class="effort-badge {{s|m|l}}">{{S|M|L}}</span></td>
+  <td class="pts">+{{n}}</td>
+</tr>
+```
+Score cell class: `bad` if <40, `warn` if 40-59, `good` if >=60. Truncate URLs longer than 30 chars with `...` in display. Word count and H1 come from the Internal and H1 exports -- do not invent them.
+
+**`{{progress_html}}` format** -- only inject when a prior audit exists. Three highlight cards showing the biggest wins:
+```html
+<section class="card">
+  <h2>Progress since last audit</h2>
+  <p class="card-desc">Compared to the audit run on <prev_date>.</p>
+  <div class="progress-grid">
+    <div class="progress-item">
+      <div class="pi-label">Site score</div>
+      <div class="pi-val">+{{delta}} pts</div>
+      <div class="pi-sub">{{prev}} to {{current}}</div>
+    </div>
+    <div class="progress-item">
+      <div class="pi-label">{{biggest_dimension_win}}</div>
+      <div class="pi-val">+{{n}} pts</div>
+      <div class="pi-sub">{{prev}}/20 to {{current}}/20 -- {{one_line_reason}}</div>
+    </div>
+    <div class="progress-item">
+      <div class="pi-label">{{notable_change}}</div>
+      <div class="pi-val">{{value}}</div>
+      <div class="pi-sub">{{context}}</div>
+    </div>
+  </div>
+</section>
+```
 
 **`<tr>` row format** for priority table:
 
