@@ -277,7 +277,6 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 | `{{artifacts_html}}` | one `.artifact` div per generated file |
 | `{{orphan_count}}` | integer count of orphan pages (0 inlinks); used in the artifacts div label |
 | `{{delta_html}}` | score delta section HTML (see format below); empty string `""` if no prior audit exists |
-| `{{histogram_buckets_json}}` | JSON array of 10 objects, one per score decile, used by the histogram chart. Format: `[{"range":"0-9","count":0},{"range":"10-19","count":3},...]` covering ranges 0-9 through 90-100. Count = number of indexable pages whose total score falls in that range. |
 | `{{expected_post_fix_score}}` | integer estimate after top-5 fixes shipped |
 
 **`.fix` div format** (inject into `{{fixes_html}}`):

@@ -43,48 +43,58 @@
   header .brand a { color: var(--accent-2); text-decoration: none; }
 
   .hero {
-    display: grid; grid-template-columns: 320px 1fr; gap: 20px;
+    display: grid; grid-template-columns: 260px 1fr; gap: 24px;
     background: var(--panel); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 24px; margin-bottom: 20px;
+    border-radius: var(--radius); padding: 28px; margin-bottom: 20px;
+    align-items: center;
   }
   @media (max-width: 760px) { .hero { grid-template-columns: 1fr; } }
 
   .gauge { display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .gauge .ring {
-    --size: 200px; --val: {{site_score}}; --max: 100;
+    --size: 220px; --val: {{site_score}};
     width: var(--size); height: var(--size); border-radius: 50%;
-    background:
-      conic-gradient(var(--accent) calc(var(--val) * 3.6deg), var(--panel-2) 0);
+    background: conic-gradient(var(--accent) calc(var(--val) * 3.6deg), var(--panel-2) 0);
     display: grid; place-items: center; position: relative;
   }
   .gauge .ring::before {
-    content: ""; width: 78%; height: 78%; background: var(--panel); border-radius: 50%; position: absolute;
+    content: ""; width: 76%; height: 76%; background: var(--panel); border-radius: 50%; position: absolute;
   }
-  .gauge .num { position: relative; font-size: 56px; font-weight: 700; letter-spacing: -0.02em; }
-  .gauge .num small { font-size: 18px; color: var(--ink-dim); font-weight: 500; }
-  .gauge .label { margin-top: 10px; color: var(--ink-dim); font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .gauge .num { position: relative; font-size: 72px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  .gauge .num small { font-size: 20px; color: var(--ink-dim); font-weight: 500; }
+  .gauge .label { margin-top: 12px; color: var(--ink-dim); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; }
 
-  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  @media (max-width: 760px) { .charts-row { grid-template-columns: 1fr; } }
-  .chart-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 24px; }
-  .chart-card h3 { font-size: 13px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 14px; font-weight: 600; }
-  .chart-card svg { display: block; width: 100%; }
-
-  .headline { font-size: 17px; line-height: 1.55; }
+  .headline { font-size: 16px; line-height: 1.6; }
   .headline strong { color: var(--accent-2); }
 
-  .dims { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+  /* F1 dimension chips */
+  .dims { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
   @media (max-width: 760px) { .dims { grid-template-columns: repeat(2, 1fr); } }
   .dim {
-    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 14px 16px;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 16px 14px;
+    position: relative; overflow: hidden;
   }
-  .dim .name { font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.08em; }
-  .dim .val { font-size: 24px; font-weight: 700; margin-top: 4px; }
-  .dim .val small { font-size: 13px; color: var(--ink-dim); font-weight: 500; }
-  .dim .bar { height: 6px; background: var(--panel-2); border-radius: 4px; overflow: hidden; margin-top: 10px; }
-  .dim .bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
-  .dim .blocker { font-size: 12px; color: var(--ink-dim); margin-top: 8px; line-height: 1.4; }
+  .dim::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--line);
+  }
+  .dim.p-max::before { background: var(--good); }
+  .dim.p-good::before { background: var(--accent-2); }
+  .dim.p-mid::before  { background: var(--warn); }
+  .dim.p-low::before  { background: var(--bad); }
+  .dim .name { font-size: 10px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
+  .dim .val {
+    font-size: 36px; font-weight: 800; letter-spacing: -0.02em;
+    margin: 10px 0 2px; line-height: 1; color: var(--ink-dim);
+  }
+  .dim.p-max .val { color: var(--good); }
+  .dim.p-good .val { color: var(--accent-2); }
+  .dim.p-mid  .val { color: var(--warn); }
+  .dim.p-low  .val { color: var(--bad); }
+  .dim .val small { font-size: 14px; font-weight: 500; color: var(--ink-dim); }
+  .dim .bar { display: none; }
+  .dim .blocker { font-size: 11px; color: var(--ink-dim); margin-top: 8px; line-height: 1.45; }
 
   section.card {
     background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
@@ -199,178 +209,17 @@
 
   {{delta_html}}
 
-  <div class="charts-row">
-    <div class="chart-card">
-      <h3>Dimension radar</h3>
-      <svg id="radar" viewBox="0 0 300 260" aria-label="Radar chart of 5 audit dimensions"></svg>
-    </div>
-    <div class="chart-card">
-      <h3>Score distribution</h3>
-      <svg id="histogram" viewBox="0 0 360 220" aria-label="Histogram of page scores"></svg>
-    </div>
-  </div>
-
   <script>
   (function() {
-    var CS = getComputedStyle(document.documentElement);
-    var accent  = CS.getPropertyValue('--accent').trim()   || '#7c5cff';
-    var accent2 = CS.getPropertyValue('--accent-2').trim() || '#22d3ee';
-    var panel2  = CS.getPropertyValue('--panel-2').trim()  || '#161a23';
-    var inkDim  = CS.getPropertyValue('--ink-dim').trim()  || '#9aa3b2';
-    var good    = CS.getPropertyValue('--good').trim()     || '#34d399';
-    var warn    = CS.getPropertyValue('--warn').trim()     || '#fbbf24';
-    var bad     = CS.getPropertyValue('--bad').trim()      || '#f87171';
-    var ns = 'http://www.w3.org/2000/svg';
-
-    function mkEl(tag, attrs) {
-      var el = document.createElementNS(ns, tag);
-      Object.keys(attrs).forEach(function(k) { el.setAttribute(k, attrs[k]); });
-      return el;
-    }
-
-    // ── Radar chart ───────────────────────────────────────────────────────────
-    var dims = [
-      { label: 'Bot Access', val: {{bot_access}}, max: 20 },
-      { label: 'Discovery',  val: {{discovery}},  max: 20 },
-      { label: 'Structure',  val: {{structure}},  max: 20 },
-      { label: 'Citability', val: {{citability}}, max: 20 },
-      { label: 'Authority',  val: {{authority}},  max: 20 }
-    ];
-    var svg = document.getElementById('radar');
-    var cx = 150, cy = 130, r = 90, n = dims.length;
-
-    function polar(cx, cy, r, i, total) {
-      var angle = (Math.PI * 2 * i / total) - Math.PI / 2;
-      return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
-    }
-
-    // Grid rings
-    [0.25, 0.5, 0.75, 1].forEach(function(pct, ri) {
-      var pts = dims.map(function(_, i) { return polar(cx, cy, r * pct, i, n).join(','); }).join(' ');
-      svg.appendChild(mkEl('polygon', {
-        points: pts,
-        fill: ri % 2 === 0 ? 'rgba(124,92,255,0.03)' : 'none',
-        stroke: '#232838', 'stroke-width': '1'
-      }));
+    var dims = document.querySelectorAll('.dim');
+    dims.forEach(function(el) {
+      var val = parseInt(el.querySelector('.val').textContent, 10);
+      var pct = val / 20;
+      if (pct >= 1)        el.classList.add('p-max');
+      else if (pct >= 0.7) el.classList.add('p-good');
+      else if (pct >= 0.4) el.classList.add('p-mid');
+      else                 el.classList.add('p-low');
     });
-    // Axis lines
-    dims.forEach(function(_, i) {
-      var pt = polar(cx, cy, r, i, n);
-      svg.appendChild(mkEl('line', {
-        x1: cx, y1: cy, x2: pt[0], y2: pt[1],
-        stroke: '#232838', 'stroke-width': '1'
-      }));
-    });
-    // Data polygon
-    var dataPts = dims.map(function(d, i) {
-      return polar(cx, cy, r * (d.val / d.max), i, n).join(',');
-    }).join(' ');
-    svg.appendChild(mkEl('polygon', {
-      points: dataPts, fill: accent, 'fill-opacity': '0.18',
-      stroke: accent, 'stroke-width': '2', 'stroke-linejoin': 'round'
-    }));
-    // Dots
-    dims.forEach(function(d, i) {
-      var pt = polar(cx, cy, r * (d.val / d.max), i, n);
-      svg.appendChild(mkEl('circle', { cx: pt[0], cy: pt[1], r: '4', fill: accent2 }));
-    });
-    // Labels: name + value on two lines, offset further out
-    dims.forEach(function(d, i) {
-      var pt = polar(cx, cy, r + 28, i, n);
-      var t1 = mkEl('text', {
-        x: pt[0], y: pt[1] - 6, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
-        'font-size': '10', fill: inkDim, 'font-family': 'system-ui, sans-serif'
-      });
-      t1.textContent = d.label;
-      svg.appendChild(t1);
-      var t2 = mkEl('text', {
-        x: pt[0], y: pt[1] + 8, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
-        'font-size': '11', fill: accent2, 'font-weight': '700',
-        'font-family': 'system-ui, sans-serif'
-      });
-      t2.textContent = d.val + '/20';
-      svg.appendChild(t2);
-    });
-
-    // ── Histogram ─────────────────────────────────────────────────────────────
-    var buckets = {{histogram_buckets_json}};
-    var hsvg = document.getElementById('histogram');
-    var padL = 38, padR = 16, padT = 24, padB = 40;
-    var hW = 360, hH = 220;
-    var chartW = hW - padL - padR, chartH = hH - padT - padB;
-    var maxCount = Math.max.apply(null, buckets.map(function(b) { return b.count; })) || 1;
-    var barW = chartW / buckets.length;
-
-    function barColor(idx) {
-      var mid = idx * 10 + 5;
-      if (mid >= 80) return good;
-      if (mid >= 60) return accent2;
-      if (mid >= 40) return warn;
-      return bad;
-    }
-
-    // Y-axis grid lines + labels
-    [0, 0.25, 0.5, 0.75, 1].forEach(function(pct) {
-      var y = padT + chartH - (pct * chartH);
-      var count = Math.round(pct * maxCount);
-      hsvg.appendChild(mkEl('line', {
-        x1: padL, y1: y, x2: hW - padR, y2: y,
-        stroke: '#232838', 'stroke-width': '1',
-        'stroke-dasharray': pct === 0 ? 'none' : '3,3'
-      }));
-      if (count > 0) {
-        var yt = mkEl('text', {
-          x: padL - 6, y: y, 'text-anchor': 'end', 'dominant-baseline': 'middle',
-          'font-size': '9', fill: inkDim, 'font-family': 'system-ui, sans-serif'
-        });
-        yt.textContent = count;
-        hsvg.appendChild(yt);
-      }
-    });
-
-    // Bars
-    buckets.forEach(function(b, i) {
-      var x = padL + i * barW + 2;
-      if (b.count === 0) {
-        hsvg.appendChild(mkEl('rect', {
-          x: x, y: padT + chartH - 2, width: barW - 4, height: 2,
-          fill: '#232838', rx: '2'
-        }));
-      } else {
-        var bh = Math.round((b.count / maxCount) * chartH);
-        var y = padT + chartH - bh;
-        hsvg.appendChild(mkEl('rect', {
-          x: x, y: y, width: barW - 4, height: bh,
-          fill: barColor(i), rx: '3'
-        }));
-        if (bh > 20) {
-          var lbl = mkEl('text', {
-            x: x + (barW - 4) / 2, y: y + 13, 'text-anchor': 'middle',
-            'font-size': '10', fill: '#fff', 'font-weight': '600',
-            'font-family': 'system-ui, sans-serif'
-          });
-          lbl.textContent = b.count;
-          hsvg.appendChild(lbl);
-        }
-      }
-      if (i % 2 === 0) {
-        var xl = mkEl('text', {
-          x: x + (barW - 4) / 2, y: padT + chartH + 16,
-          'text-anchor': 'middle', 'font-size': '9',
-          fill: inkDim, 'font-family': 'system-ui, sans-serif'
-        });
-        xl.textContent = i * 10;
-        hsvg.appendChild(xl);
-      }
-    });
-
-    // X axis label
-    var xlbl = mkEl('text', {
-      x: padL + chartW / 2, y: hH - 4, 'text-anchor': 'middle',
-      'font-size': '9', fill: inkDim, 'font-family': 'system-ui, sans-serif'
-    });
-    xlbl.textContent = 'Page score';
-    hsvg.appendChild(xlbl);
   })();
   </script>
 
