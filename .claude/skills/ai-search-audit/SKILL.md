@@ -134,6 +134,27 @@ Limit to top 50 pages by inlink count, grouped by URL path prefix.
 
 **D. `reports/<domain>/content-rewrite-recs.md`:** for each Weak/Invisible page in the top-50 by inlinks, write a specific restructuring recommendation. Format: current opening (quoted), problem (one line), suggested rewrite of first paragraph (Q&A or definitive-answer style).
 
+**E. `reports/<domain>/orphan-pages.md`:** list of all indexable 200-status pages with 0 internal inlinks, derived from the `sf_url_links` inlink data collected in step 4. These pages are unreachable by LLM crawlers regardless of content quality. Format:
+
+```markdown
+# Orphan Pages: <domain>
+
+<n> indexable pages have zero internal inlinks. LLM crawlers cannot reach them through site navigation.
+
+## Fix options
+- Add links to orphan pages from relevant hub pages or the sitemap.
+- If pages are intentionally standalone, add them to llms.txt directly.
+- If pages have no value, consider removing or redirecting them.
+
+## Orphan page list
+| URL | Title | Score |
+|---|---|---|
+| /path/to/page | Page Title | 42 |
+...
+```
+
+Skip this artifact (write empty file with note) if 0 orphan pages found.
+
 ### 8. Write the main report (markdown + HTML one-pager)
 
 Two formats, same data, both written every run.
@@ -175,6 +196,7 @@ Two formats, same data, both written every run.
 - Robots patch: `reports/<domain>/robots-ai-bots-patch.txt`
 - Schema patches: `reports/<domain>/schema-patches/` (<n> files)
 - Content rewrite recs: `reports/<domain>/content-rewrite-recs.md`
+- Orphan pages: `reports/<domain>/orphan-pages.md` (<n> pages with 0 inlinks)
 
 ## Appendix: full per-page scores
 <table>
@@ -211,6 +233,7 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 | `{{bucket_strong}}`, `{{bucket_decent}}`, `{{bucket_weak}}`, `{{bucket_invisible}}` | page counts |
 | `{{priority_rows_html}}` | `<tr>` rows for top-10 invisible pages by inlink count |
 | `{{artifacts_html}}` | one `.artifact` div per generated file |
+| `{{orphan_count}}` | integer count of orphan pages (0 inlinks); used in the artifacts div label |
 | `{{expected_post_fix_score}}` | integer estimate after top-5 fixes shipped |
 
 **`.fix` div format** (inject into `{{fixes_html}}`):
