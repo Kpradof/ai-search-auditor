@@ -61,6 +61,7 @@ Ask the user (skip if already in request):
 - Crawl cap (default: 500 URLs).
 - JS rendering on/off (default: off; turn on for SPAs).
 - Page-set focus: full site, blog only, product pages only, etc.
+- Re-audit or first run? If re-audit, call `sf_list_crawls` to check for a prior crawl of the same domain. If one exists, load it with `sf_load_crawl` and extract the previous scores from `reports/<domain>/audit-*.md` (most recent file). Use these to compute deltas in the report.
 
 ### 2. Pre-crawl checks (no crawl yet)
 
@@ -197,6 +198,17 @@ Two formats, same data, both written every run.
 | Citability | x/20 | ... |
 | Authority  | x/20 | ... |
 
+## Score delta (vs previous audit)
+Only include this section if a prior audit exists for the domain.
+| Dimension | Previous | Current | Delta |
+|---|---|---|---|
+| Bot Access | x/20 | x/20 | +n / -n |
+| Discovery | x/20 | x/20 | +n / -n |
+| Structure | x/20 | x/20 | +n / -n |
+| Citability | x/20 | x/20 | +n / -n |
+| Authority  | x/20 | x/20 | +n / -n |
+| **Site total** | x/100 | x/100 | **+n / -n** |
+
 ## Top 5 fixes that move the needle
 1. <fix>. Effort: S/M/L · expected score gain: +n
 2. ...
@@ -252,6 +264,7 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 | `{{priority_rows_html}}` | `<tr>` rows for top-10 invisible pages by inlink count |
 | `{{artifacts_html}}` | one `.artifact` div per generated file |
 | `{{orphan_count}}` | integer count of orphan pages (0 inlinks); used in the artifacts div label |
+| `{{delta_html}}` | score delta section HTML (see format below); empty string `""` if no prior audit exists |
 | `{{expected_post_fix_score}}` | integer estimate after top-5 fixes shipped |
 
 **`.fix` div format** (inject into `{{fixes_html}}`):
@@ -280,6 +293,25 @@ The priority table shows the **top 10 pages by inlink count that score below Dec
 </tr>
 ```
 Class on `.score` cell: `bad` if <40, `warn` if 40-59, `good` if >=60.
+
+**`{{delta_html}}` format** (inject when prior audit exists, otherwise use empty string):
+```html
+<section class="card">
+  <h2>Score delta vs. previous audit (<prev_date>)</h2>
+  <table>
+    <thead><tr><th>Dimension</th><th>Previous</th><th>Current</th><th>Delta</th></tr></thead>
+    <tbody>
+      <tr><td>Bot Access</td><td>x/20</td><td>x/20</td><td class="score good">+n</td></tr>
+      <tr><td>Discovery</td><td>x/20</td><td>x/20</td><td class="score bad">-n</td></tr>
+      <tr><td>Structure</td><td>x/20</td><td>x/20</td><td>0</td></tr>
+      <tr><td>Citability</td><td>x/20</td><td>x/20</td><td class="score good">+n</td></tr>
+      <tr><td>Authority</td><td>x/20</td><td>x/20</td><td class="score good">+n</td></tr>
+      <tr><td><strong>Site total</strong></td><td>x/100</td><td>x/100</td><td class="score good"><strong>+n</strong></td></tr>
+    </tbody>
+  </table>
+</section>
+```
+Delta cell class: `good` if positive, `bad` if negative, no class if zero.
 
 **`.artifact` div format:**
 ```html
