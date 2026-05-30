@@ -90,7 +90,8 @@ Use the official MCP tools to pull all data needed for scoring:
 - `sf_export_seo_element_urls` with `seo_element_name="Meta Description"` — meta descriptions.
 - `sf_export_seo_element_urls` with `seo_element_name="Canonicals"` — canonical URL per page.
 - `sf_bulk_export_page_content` — full page text in NDJSON format; use for citability analysis (first 200 words, Q&A blocks, named entities, author bylines, dates, external links).
-- `sf_url_links` with `links_direction="inlinks"` for each page in the top-50 by estimated traffic — use to build the inlink count table needed for priority sorting and site score weighting.
+- `sf_url_links` with `links_direction="inlinks"` for each page in the top-50 by estimated traffic -- use to build the inlink count table needed for priority sorting and site score weighting.
+- `sf_url_links` with `links_direction="outlinks"` for each indexable page -- use to score two rubric checks deterministically: (1) external link count for Citability "cited sources" check (>=2 distinct external domains = 3pts, else 0); (2) authoritative outlink check for Authority (filter for .gov, .edu, wikipedia.org, pubmed.ncbi.nlm.nih.gov, w3.org, ietf.org, schema.org -- >=1 match = 3pts, else 0). Do not infer these from page text; use the outlink data.
 
 ### 5. Score per page
 

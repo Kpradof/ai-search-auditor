@@ -95,6 +95,9 @@ Patterns LLMs preferentially cite. Based on observed citation behavior in publis
 | Body content > 300 words and < 3000 words (sweet spot) | 2 |
 | Avoids walls of marketing copy in first paragraph (heuristic: first paragraph contains a concrete fact, number, or definition) | 1 |
 
+**Verification notes (Citability):**
+- "Has cited sources" check: use `sf_url_links direction=outlinks` per page. Count distinct external domains. Score 3 if >=2, else 0. Do not infer from page text.
+
 ---
 
 ## 5. Authority Signals (0-20): per page (with site-level lift)
@@ -110,6 +113,9 @@ LLMs cite sources that look authoritative.
 | Site Organization schema includes `sameAs` to LinkedIn/Wikipedia/Crunchbase | 3 |
 | Page has >=10 internal inlinks from other indexable pages | 3 |
 | Site has been linked from Wikipedia (if computable from crawl backlink data; score 0 if not verifiable) | 3 |
+
+**Verification notes (Authority):**
+- "Links to primary research" check: use `sf_url_links direction=outlinks` per page. Filter outlink domains ending in `.gov`, `.edu`, or matching `wikipedia.org`, `pubmed.ncbi.nlm.nih.gov`, `w3.org`, `ietf.org`, `schema.org`. Score 3 if >=1 match, else 0. Do not infer from page text.
 
 ---
 
