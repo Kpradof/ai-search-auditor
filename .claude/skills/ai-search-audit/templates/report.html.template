@@ -3,163 +3,146 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>AI Search Readiness Audit — {{domain}}</title>
+<title>AI Search Readiness Audit -- {{domain}}</title>
 <style>
   :root {
-    --bg: #0b0d12;
-    --panel: #11141b;
-    --panel-2: #161a23;
-    --ink: #e7ebf3;
-    --ink-dim: #9aa3b2;
-    --accent: #7c5cff;
-    --accent-2: #22d3ee;
-    --good: #34d399;
-    --warn: #fbbf24;
-    --bad: #f87171;
-    --line: #232838;
-    --radius: 14px;
-  }
-  @media (prefers-color-scheme: light) {
-    :root {
-      --bg: #f7f8fb;
-      --panel: #ffffff;
-      --panel-2: #f1f3f8;
-      --ink: #11141b;
-      --ink-dim: #5a6275;
-      --line: #e4e7ef;
-    }
+    --bg: #0b0d12; --panel: #11141b; --panel-2: #161a23;
+    --ink: #e7ebf3; --ink-dim: #9aa3b2;
+    --accent: #7c5cff; --accent-2: #22d3ee;
+    --good: #34d399; --warn: #fbbf24; --bad: #f87171;
+    --line: #232838; --radius: 14px;
   }
   * { box-sizing: border-box; }
   html, body { background: var(--bg); color: var(--ink); margin: 0; }
-  body {
-    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
-    padding: 40px 24px 80px;
-  }
+  body { font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; padding: 40px 24px 80px; }
   .wrap { max-width: 1080px; margin: 0 auto; }
+
   header { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 28px; flex-wrap: wrap; }
-  header h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  header h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.01em; }
   header .meta { color: var(--ink-dim); font-size: 13px; }
   header .brand { font-size: 12px; color: var(--ink-dim); text-align: right; }
   header .brand a { color: var(--accent-2); text-decoration: none; }
 
-  .hero {
-    display: grid; grid-template-columns: 260px 1fr; gap: 24px;
-    background: var(--panel); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 28px; margin-bottom: 20px;
-    align-items: center;
-  }
+  /* Hero */
+  .hero { display: grid; grid-template-columns: 280px 1fr; gap: 28px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; margin-bottom: 20px; align-items: center; }
   @media (max-width: 760px) { .hero { grid-template-columns: 1fr; } }
-
-  .gauge { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .gauge .ring {
-    --size: 220px; --val: {{site_score}};
-    width: var(--size); height: var(--size); border-radius: 50%;
-    background: conic-gradient(var(--accent) calc(var(--val) * 3.6deg), var(--panel-2) 0);
-    display: grid; place-items: center; position: relative;
-  }
-  .gauge .ring::before {
-    content: ""; width: 76%; height: 76%; background: var(--panel); border-radius: 50%; position: absolute;
-  }
-  .gauge .num { position: relative; font-size: 72px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
-  .gauge .num small { font-size: 20px; color: var(--ink-dim); font-weight: 500; }
-  .gauge .label { margin-top: 12px; color: var(--ink-dim); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; }
-
-  .headline { font-size: 16px; line-height: 1.6; }
+  .gauge-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .gauge { position: relative; width: 200px; height: 200px; }
+  .gauge .ring { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--accent) calc(var(--val, 0) * 3.6deg), var(--panel-2) 0); display: grid; place-items: center; }
+  .gauge .ring::before { content: ""; width: 76%; height: 76%; background: var(--panel); border-radius: 50%; position: absolute; }
+  .gauge .num { position: relative; font-size: 64px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; z-index: 1; }
+  .gauge .num small { font-size: 18px; color: var(--ink-dim); font-weight: 500; }
+  .score-timeline { display: flex; align-items: center; gap: 0; width: 100%; }
+  .tl-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .tl-item .tl-label { font-size: 9px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+  .tl-item .tl-val { font-size: 15px; font-weight: 800; }
+  .tl-item.past .tl-val { color: var(--ink-dim); }
+  .tl-item.now .tl-val { color: var(--accent-2); }
+  .tl-item.target .tl-val { color: var(--good); }
+  .tl-arrow { flex: 1; height: 1px; background: var(--line); position: relative; margin: 0 6px; top: 4px; }
+  .tl-arrow::after { content: ""; position: absolute; right: -4px; top: -3px; border-left: 6px solid var(--line); border-top: 3px solid transparent; border-bottom: 3px solid transparent; }
+  .headline-label { font-size: 10px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 8px; }
+  .headline { font-size: 15px; line-height: 1.65; margin: 0 0 14px; }
   .headline strong { color: var(--accent-2); }
 
-  /* F1 dimension chips */
+  /* Dimension chips */
   .dims { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
   @media (max-width: 760px) { .dims { grid-template-columns: repeat(2, 1fr); } }
-  .dim {
-    background: var(--panel); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 16px 14px;
-    position: relative; overflow: hidden;
-  }
-  .dim::before {
-    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: var(--line);
-  }
+  .dim { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 14px; position: relative; overflow: hidden; }
+  .dim::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--line); }
   .dim.p-max::before { background: var(--good); }
   .dim.p-good::before { background: var(--accent-2); }
   .dim.p-mid::before  { background: var(--warn); }
   .dim.p-low::before  { background: var(--bad); }
   .dim .name { font-size: 10px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
-  .dim .val {
-    font-size: 36px; font-weight: 800; letter-spacing: -0.02em;
-    margin: 10px 0 2px; line-height: 1; color: var(--ink-dim);
-  }
+  .dim .val { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; margin: 8px 0 2px; line-height: 1; color: var(--ink-dim); }
   .dim.p-max .val { color: var(--good); }
   .dim.p-good .val { color: var(--accent-2); }
   .dim.p-mid  .val { color: var(--warn); }
   .dim.p-low  .val { color: var(--bad); }
-  .dim .val small { font-size: 14px; font-weight: 500; color: var(--ink-dim); }
-  .dim .bar { display: none; }
+  .dim .val small { font-size: 13px; font-weight: 500; color: var(--ink-dim); }
   .dim .blocker { font-size: 11px; color: var(--ink-dim); margin-top: 8px; line-height: 1.45; }
 
-  section.card {
-    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 22px 24px; margin-bottom: 16px;
-  }
-  section.card h2 { font-size: 18px; margin: 0 0 14px; letter-spacing: -0.01em; }
+  /* Cards */
+  section.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px; margin-bottom: 16px; }
+  section.card h2 { font-size: 17px; margin: 0 0 4px; letter-spacing: -0.01em; font-weight: 700; }
+  .card-desc { font-size: 13px; color: var(--ink-dim); margin: 0 0 16px; line-height: 1.5; }
 
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table th { font-size: 10px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; }
+  table td { padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table tbody tr:last-child td { border-bottom: none; }
+  table tbody tr:hover td { background: var(--panel-2); }
+  table td a { color: var(--accent-2); text-decoration: none; font-weight: 600; }
+  table td code { font-size: 11px; background: var(--panel-2); padding: 1px 5px; border-radius: 4px; white-space: nowrap; }
+  .score-cell { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 14px; }
+  .score-cell.warn { color: var(--warn); }
+  .score-cell.bad  { color: var(--bad); }
+  .score-cell.good { color: var(--good); }
+  .url-cell { white-space: nowrap; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+  .h1-cell { color: var(--ink-dim); font-size: 12px; max-width: 120px; }
+  .problem-cell { font-size: 12px; color: var(--ink-dim); max-width: 160px; }
+  .fix-cell { font-size: 12px; max-width: 220px; }
+  .num-cell { font-variant-numeric: tabular-nums; color: var(--ink-dim); font-size: 12px; }
+  .effort-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 800; }
+  .effort-badge.s { background: rgba(52,211,153,0.18); color: var(--good); }
+  .effort-badge.m { background: rgba(251,191,36,0.18); color: var(--warn); }
+  .effort-badge.l { background: rgba(248,113,113,0.18); color: var(--bad); }
+  .pts { font-weight: 700; color: var(--accent-2); font-size: 13px; }
+
+  /* Fixes list */
   .fixes { display: grid; gap: 8px; }
-  .fix { display: grid; grid-template-columns: 28px 1fr auto; gap: 12px; align-items: center; padding: 12px; background: var(--panel-2); border-radius: 10px; }
-  .fix .rank { font-weight: 700; color: var(--accent); font-size: 16px; }
-  .fix .text { font-size: 14px; line-height: 1.5; }
-  .fix .meta { font-size: 12px; color: var(--ink-dim); white-space: nowrap; }
-  .fix-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim); padding: 6px 2px 2px; }
-  .fix-label.quick { color: var(--good); }
-  .fix-label.strategic { color: var(--warn); }
-  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
-  .pill.s { background: rgba(52, 211, 153, 0.15); color: var(--good); }
-  .pill.m { background: rgba(251, 191, 36, 0.18); color: var(--warn); }
-  .pill.l { background: rgba(248, 113, 113, 0.18); color: var(--bad); }
+  .fix-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 0 2px; }
+  .fix-group-label.quick { color: var(--good); }
+  .fix-group-label.strategic { color: var(--warn); }
+  .fix-row { display: grid; grid-template-columns: 26px 1fr auto; gap: 10px; align-items: start; padding: 12px; background: var(--panel-2); border-radius: 10px; }
+  .fix-row .rank { font-weight: 800; color: var(--accent); font-size: 15px; padding-top: 1px; }
+  .fix-row .fix-text { font-size: 13px; line-height: 1.55; }
+  .fix-row .fix-meta { font-size: 11px; color: var(--ink-dim); white-space: nowrap; text-align: right; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+  .pill { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+  .pill.s { background: rgba(52,211,153,0.15); color: var(--good); }
+  .pill.m { background: rgba(251,191,36,0.18); color: var(--warn); }
+  .pill.l { background: rgba(248,113,113,0.18); color: var(--bad); }
 
-  /* Fix priority matrix */
-  .matrix { display: grid; grid-template-columns: 40px 1fr 1fr 1fr; grid-template-rows: auto auto auto auto; gap: 0; margin-bottom: 16px; }
-  .matrix-corner { display: flex; align-items: flex-end; justify-content: flex-end; padding: 0 8px 6px 0; font-size: 10px; color: var(--ink-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
-  .matrix-col-hdr { text-align: center; padding: 6px 4px; font-size: 10px; color: var(--ink-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--line); }
-  .matrix-row-hdr { display: flex; align-items: center; justify-content: flex-end; padding: 6px 10px 6px 0; font-size: 10px; color: var(--ink-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; writing-mode: horizontal-tb; border-right: 1px solid var(--line); }
-  .matrix-cell { min-height: 56px; border: 1px solid var(--line); border-top: none; border-left: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center; padding: 8px 6px; background: var(--panel-2); }
-  .matrix-cell:last-child { border-right: 1px solid var(--line); }
-  .mx-chip { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; font-size: 12px; font-weight: 800; color: #fff; background: var(--accent); flex-shrink: 0; }
-  .mx-chip.s { background: var(--good); }
-  .mx-chip.m { background: var(--warn); color: #000; }
-  .mx-chip.l { background: var(--bad); }
+  /* Progress since last audit */
+  .progress-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 760px) { .progress-grid { grid-template-columns: 1fr; } }
+  .progress-item { background: var(--panel-2); border-radius: 10px; padding: 14px 16px; }
+  .progress-item .pi-label { font-size: 10px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
+  .progress-item .pi-val { font-size: 22px; font-weight: 800; margin-top: 4px; color: var(--good); }
+  .progress-item .pi-sub { font-size: 11px; color: var(--ink-dim); margin-top: 2px; line-height: 1.4; }
 
+  /* Buckets */
+  .bucket-intro { font-size: 13px; color: var(--ink-dim); line-height: 1.6; margin-bottom: 14px; padding: 14px 16px; background: var(--panel-2); border-radius: 10px; border-left: 3px solid var(--accent); }
+  .bucket-intro strong { color: var(--ink); }
   .buckets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
   @media (max-width: 760px) { .buckets { grid-template-columns: repeat(2, 1fr); } }
-  .bucket { background: var(--panel-2); border-radius: 10px; padding: 14px; text-align: center; }
-  .bucket .b-num { font-size: 28px; font-weight: 700; }
-  .bucket .b-label { font-size: 12px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+  .bucket { background: var(--panel-2); border-radius: 10px; padding: 16px 14px; }
+  .bucket .b-num { font-size: 32px; font-weight: 800; line-height: 1; }
+  .bucket .b-label { font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 4px; font-weight: 700; }
+  .bucket .b-desc { font-size: 11px; color: var(--ink-dim); margin-top: 6px; line-height: 1.4; }
   .bucket.strong .b-num { color: var(--good); }
   .bucket.decent .b-num { color: var(--accent-2); }
-  .bucket.weak .b-num { color: var(--warn); }
+  .bucket.weak   .b-num { color: var(--warn); }
   .bucket.invisible .b-num { color: var(--bad); }
 
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  table th, table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
-  table th { font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
-  table tbody tr:hover { background: var(--panel-2); }
-  table td.score { font-variant-numeric: tabular-nums; font-weight: 600; }
-  table td.score.bad { color: var(--bad); }
-  table td.score.warn { color: var(--warn); }
-  table td.score.good { color: var(--good); }
-  table td a { color: var(--accent-2); text-decoration: none; word-break: break-all; }
-
-  .artifacts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  /* Artifacts */
+  .artifacts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
   @media (max-width: 760px) { .artifacts { grid-template-columns: 1fr; } }
-  .artifact { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--panel-2); border-radius: 10px; font-size: 13px; }
-  .artifact .ico { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 12px; }
-  .artifact code { background: transparent; color: var(--ink-dim); font-size: 12px; }
+  .artifact { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--panel-2); border-radius: 10px; font-size: 13px; }
+  .artifact .ico { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 11px; flex-shrink: 0; }
+  .artifact .ico.ready { background: var(--good); color: #000; }
+  .artifact code { background: transparent; color: var(--ink-dim); font-size: 11px; display: block; margin-top: 1px; }
 
-  footer { text-align: center; color: var(--ink-dim); font-size: 12px; margin-top: 32px; }
+  footer { text-align: center; color: var(--ink-dim); font-size: 12px; margin-top: 32px; line-height: 1.8; }
   footer a { color: var(--accent-2); text-decoration: none; }
+  footer strong { color: var(--ink); }
 
   @media print {
     body { padding: 0; }
     .wrap { max-width: none; }
-    section.card, .hero, .dim { break-inside: avoid; box-shadow: none; }
+    section.card, .hero, .dim { break-inside: avoid; }
   }
 </style>
 </head>
@@ -169,23 +152,42 @@
   <header>
     <div>
       <h1>AI Search Readiness Audit</h1>
-      <div class="meta">{{domain}} · crawled {{crawl_date}} · {{urls_crawled}} URLs · JS rendering {{js_rendering}}</div>
+      <div class="meta">{{domain}} &nbsp;·&nbsp; crawled {{crawl_date}} &nbsp;·&nbsp; {{urls_crawled}} URLs crawled &nbsp;·&nbsp; JS rendering {{js_rendering}}</div>
     </div>
     <div class="brand">
-      generated by <a href="https://github.com/{{repo_owner}}/ai-search-auditor">ai-search-auditor</a><br>
-      <span>Screaming Frog MCP · Claude</span>
+      <a href="https://github.com/{{repo_owner}}/ai-search-auditor">ai-search-auditor</a><br>
+      Screaming Frog MCP &nbsp;·&nbsp; Claude
     </div>
   </header>
 
   <div class="hero">
-    <div class="gauge">
-      <div class="ring"><div class="num">{{site_score}}<small>/100</small></div></div>
-      <div class="label">Site score</div>
+    <div class="gauge-wrap">
+      <div class="gauge">
+        <div class="ring" style="--val:{{site_score}}">
+          <div class="num">{{site_score}}<small>/100</small></div>
+        </div>
+      </div>
+      <div class="score-timeline">
+        <div class="tl-item past">
+          <span class="tl-label">Last audit</span>
+          <span class="tl-val">{{prev_score}}</span>
+        </div>
+        <div class="tl-arrow"></div>
+        <div class="tl-item now">
+          <span class="tl-label">Today</span>
+          <span class="tl-val">{{site_score}}</span>
+        </div>
+        <div class="tl-arrow"></div>
+        <div class="tl-item target">
+          <span class="tl-label">After fixes</span>
+          <span class="tl-val">{{expected_post_fix_score}}</span>
+        </div>
+      </div>
     </div>
     <div>
-      <div style="font-size:11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Headline finding</div>
+      <div class="headline-label">Headline finding</div>
       <p class="headline"><strong>{{headline_gap}}</strong> {{headline_consequence}} {{headline_action}}</p>
-      <div style="margin-top: 14px; font-size: 13px; color: var(--ink-dim);">Top-50 most-linked pages average <strong style="color: var(--ink);">{{top50_avg}}/100</strong>.</div>
+      <div style="font-size:13px;color:var(--ink-dim);">Top-50 most-linked pages average <strong style="color:var(--ink);">{{top50_avg}}/100</strong>.</div>
     </div>
   </div>
 
@@ -193,98 +195,99 @@
     <div class="dim">
       <div class="name">Bot Access</div>
       <div class="val">{{bot_access}}<small>/20</small></div>
-      <div class="bar"><span style="width: {{bot_access_pct}}%"></span></div>
       <div class="blocker">{{bot_access_blocker}}</div>
     </div>
     <div class="dim">
       <div class="name">Discovery</div>
       <div class="val">{{discovery}}<small>/20</small></div>
-      <div class="bar"><span style="width: {{discovery_pct}}%"></span></div>
       <div class="blocker">{{discovery_blocker}}</div>
     </div>
     <div class="dim">
       <div class="name">Structure</div>
       <div class="val">{{structure}}<small>/20</small></div>
-      <div class="bar"><span style="width: {{structure_pct}}%"></span></div>
       <div class="blocker">{{structure_blocker}}</div>
     </div>
     <div class="dim">
       <div class="name">Citability</div>
       <div class="val">{{citability}}<small>/20</small></div>
-      <div class="bar"><span style="width: {{citability_pct}}%"></span></div>
       <div class="blocker">{{citability_blocker}}</div>
     </div>
     <div class="dim">
       <div class="name">Authority</div>
       <div class="val">{{authority}}<small>/20</small></div>
-      <div class="bar"><span style="width: {{authority_pct}}%"></span></div>
       <div class="blocker">{{authority_blocker}}</div>
     </div>
   </div>
 
-  {{delta_html}}
-
-  <script>
-  (function() {
-    var dims = document.querySelectorAll('.dim');
-    dims.forEach(function(el) {
-      var val = parseInt(el.querySelector('.val').textContent, 10);
-      var pct = val / 20;
-      if (pct >= 1)        el.classList.add('p-max');
-      else if (pct >= 0.7) el.classList.add('p-good');
-      else if (pct >= 0.4) el.classList.add('p-mid');
-      else                 el.classList.add('p-low');
-    });
-  })();
-  </script>
-
   <section class="card">
-    <h2>Top 5 fixes that move the needle</h2>
-    <div class="matrix">
-      <div class="matrix-corner">Impact</div>
-      <div class="matrix-col-hdr">S &mdash; This week</div>
-      <div class="matrix-col-hdr">M &mdash; This sprint</div>
-      <div class="matrix-col-hdr">L &mdash; Next quarter</div>
-      {{matrix_html}}
-    </div>
-    <div class="fixes">{{fixes_html}}</div>
-  </section>
-
-  <section class="card">
-    <h2>Page buckets</h2>
-    <div class="buckets">
-      <div class="bucket strong"><div class="b-num">{{bucket_strong}}</div><div class="b-label">Strong 80–100</div></div>
-      <div class="bucket decent"><div class="b-num">{{bucket_decent}}</div><div class="b-label">Decent 60–79</div></div>
-      <div class="bucket weak"><div class="b-num">{{bucket_weak}}</div><div class="b-label">Weak 40–59</div></div>
-      <div class="bucket invisible"><div class="b-num">{{bucket_invisible}}</div><div class="b-label">Invisible 0–39</div></div>
-    </div>
-  </section>
-
-  <section class="card">
-    <h2>Priority fix list — top pages below Decent (&lt; 60) by inlink count</h2>
+    <h2>Page-level working plan</h2>
+    <p class="card-desc">Top pages below Decent by inlink count. The ones AI crawlers see most. Fix these first.</p>
     <table>
-      <thead><tr><th>URL</th><th>Inlinks</th><th>Score</th><th>Top miss</th></tr></thead>
-      <tbody>{{priority_rows_html}}</tbody>
+      <thead>
+        <tr>
+          <th>Page</th>
+          <th>H1</th>
+          <th>Words</th>
+          <th>Score</th>
+          <th>Problem</th>
+          <th>How to fix</th>
+          <th>Effort</th>
+          <th>+pts</th>
+        </tr>
+      </thead>
+      <tbody>{{working_plan_html}}</tbody>
     </table>
   </section>
 
   <section class="card">
+    <h2>Top 5 site-wide fixes</h2>
+    <p class="card-desc">Patterns that repeat across many pages. Fix these once and every page benefits.</p>
+    <div class="fixes">{{fixes_html}}</div>
+  </section>
+
+  {{progress_html}}
+
+  <section class="card">
+    <h2>Page score breakdown</h2>
+    <div class="bucket-intro">
+      <strong>How this works:</strong> Every page on your site gets a score from 0 to 100. The score measures how likely AI search engines like ChatGPT, Claude, and Perplexity are to cite that page when answering a question. It combines five signals: bot access, discoverability, schema structure, content citability, and authority. Pages below 60 are rarely cited regardless of content quality.
+    </div>
+    <div class="buckets">
+      <div class="bucket strong"><div class="b-num">{{bucket_strong}}</div><div class="b-label">Strong 80-100</div><div class="b-desc">Citation-ready. AI engines find and cite these.</div></div>
+      <div class="bucket decent"><div class="b-num">{{bucket_decent}}</div><div class="b-label">Decent 60-79</div><div class="b-desc">Minor gaps. A few fixes push these into Strong.</div></div>
+      <div class="bucket weak"><div class="b-num">{{bucket_weak}}</div><div class="b-label">Weak 40-59</div><div class="b-desc">Structural problems. Needs schema or content rewrite.</div></div>
+      <div class="bucket invisible"><div class="b-num">{{bucket_invisible}}</div><div class="b-label">Invisible 0-39</div><div class="b-desc">AI engines skip these entirely.</div></div>
+    </div>
+  </section>
+
+  <section class="card">
     <h2>Generated artifacts</h2>
+    <p class="card-desc">Files ready to deploy or hand off to a developer today.</p>
     <div class="artifacts">{{artifacts_html}}</div>
   </section>
 
   <footer>
-    Re-audit in 4 weeks after shipping the top fixes. Expected post-fix site score:
-    <strong style="color: var(--ink);">{{expected_post_fix_score}}/100</strong>.
-    <br>
-    Rubric: <a href="https://github.com/{{repo_owner}}/ai-search-auditor/blob/main/.claude/skills/ai-search-audit/rubric.md">deterministic, auditable</a> · v{{rubric_version}}.
-    <br style="margin-bottom: 6px;">
-    <span style="font-size: 11px; color: var(--ink-dim); max-width: 700px; display: inline-block; margin-top: 8px; line-height: 1.5;">
+    Re-audit in 4 weeks after shipping the top fixes. Expected score: <strong>{{expected_post_fix_score}}/100</strong>.<br>
+    Rubric: <a href="https://github.com/{{repo_owner}}/ai-search-auditor/blob/main/.claude/skills/ai-search-audit/rubric.md">deterministic, auditable</a> &nbsp;·&nbsp; v{{rubric_version}}
+    <br style="margin-bottom:6px;">
+    <span style="font-size:11px;color:var(--ink-dim);max-width:700px;display:inline-block;margin-top:8px;line-height:1.5;">
       Scope: optimized for citations in ChatGPT, Claude, and Perplexity.
-      For Google AI Overviews, <a href="https://developers.google.com/search/docs/fundamentals/ai-optimization-guide" style="color: var(--ink-dim);">Google's own guidance</a> prioritizes foundational SEO over llms.txt and structured data -- use Search Console for Google AI signals.
+      For Google AI Overviews, <a href="https://developers.google.com/search/docs/fundamentals/ai-optimization-guide" style="color:var(--ink-dim);">Google's own guidance</a> prioritizes foundational SEO over llms.txt and structured data -- use Search Console for Google AI signals.
     </span>
   </footer>
 
 </div>
+<script>
+(function() {
+  document.querySelectorAll('.dim').forEach(function(el) {
+    var val = parseInt(el.querySelector('.val').textContent, 10);
+    var pct = val / 20;
+    if (pct >= 1)        el.classList.add('p-max');
+    else if (pct >= 0.7) el.classList.add('p-good');
+    else if (pct >= 0.4) el.classList.add('p-mid');
+    else                 el.classList.add('p-low');
+  });
+})();
+</script>
 </body>
 </html>
