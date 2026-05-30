@@ -2,7 +2,7 @@
 
 Find out whether ChatGPT, Claude, Perplexity, and Google AI Overviews will cite your site, and get a concrete, prioritized fix list to make sure they will.
 
-Powered by [Screaming Frog SEO Spider](https://www.screamingfrog.co.uk/seo-spider/) (via the [`bzsasson/screaming-frog-mcp`](https://github.com/bzsasson/screaming-frog-mcp) community MCP server) and [Claude](https://claude.com/claude-code). Open source, deterministic scoring, no SaaS account, no API keys.
+Powered by [Screaming Frog SEO Spider](https://www.screamingfrog.co.uk/seo-spider/) (official built-in MCP server, v24+) and [Claude](https://claude.com/claude-code). Open source, deterministic scoring, no SaaS account, no API keys.
 
 ---
 
@@ -17,7 +17,7 @@ This repo gives you:
 - **A Claude Code skill** (`ai-search-audit`) that runs a full audit by chatting with Claude.
 - **A deterministic 100-point scoring rubric** across 5 dimensions. Auditable, not vibes.
 - **Generated fix artifacts**: a ready-to-deploy `llms.txt`, a robots.txt patch for AI crawlers, schema JSON-LD patches, and per-page content-rewrite recommendations.
-- **A Screaming Frog MCP integration** that does the crawl. No browser automation, no scraping. Screaming Frog is the industry-standard crawler and the MCP gives Claude programmatic access.
+- **A Screaming Frog MCP integration** that does the crawl. No browser automation, no scraping. Screaming Frog is the industry-standard crawler; the built-in MCP server (v24+) gives Claude direct programmatic access with 30+ tools.
 
 ---
 
@@ -43,9 +43,8 @@ Pages bucket into **Strong (80-100)**, **Decent (60-79)**, **Weak (40-59)**, **I
 
 ### Prerequisites
 
-- [Screaming Frog SEO Spider](https://www.screamingfrog.co.uk/seo-spider/) installed locally. Verified with **v16+**; a paid license is recommended (the free tier caps crawls at 500 URLs).
+- [Screaming Frog SEO Spider](https://www.screamingfrog.co.uk/seo-spider/) v24+ installed locally. The MCP server is built in — no extra installs needed. A paid license is recommended (the free tier caps crawls at 500 URLs).
 - [Claude Code](https://docs.claude.com/en/docs/agents-and-tools/claude-code/overview) installed.
-- [`uv`](https://docs.astral.sh/uv/) installed (`brew install uv` on macOS, or see uv docs). The MCP server runs via `uvx`, which pulls a pinned Python at install time so the audit works regardless of your system Python.
 
 ### Clone
 
@@ -54,25 +53,27 @@ git clone https://github.com/Kpradof/ai-search-auditor.git
 cd ai-search-auditor
 ```
 
-### Wire up the MCP server
+### Start the MCP server
 
-The audit uses [`bzsasson/screaming-frog-mcp`](https://github.com/bzsasson/screaming-frog-mcp), a community MCP server that wraps Screaming Frog's headless CLI. The repo ships with `.mcp.json` already configured for **macOS**. If that's you, no edits needed.
+Open Screaming Frog SEO Spider, then start the built-in MCP server:
 
-**Windows**: copy `.mcp.json.windows-example` over `.mcp.json`.
+```
+MCP > Start MCP Server
+```
 
-**Linux**: copy `.mcp.json.linux-example` over `.mcp.json`.
+The status bar will show the server is running at `http://localhost:11435/mcp`. To start it automatically on launch, enable it under `File > Settings > MCP Server`.
 
-If your Screaming Frog install path differs from the default, edit `SF_CLI_PATH` in `.mcp.json`.
+The repo's `.mcp.json` is already configured to connect to that URL — no edits needed.
 
-Verify the MCP server is reachable:
+Verify the connection:
 
 ```bash
 claude mcp list
 ```
 
-You should see `screaming-frog` with a `✓ Connected` status.
+You should see `seospider` with a `✓ Connected` status.
 
-> **Important workflow note:** Screaming Frog uses a single-process database. **Close the Screaming Frog GUI before running an audit**. The MCP server cannot read crawl data while the GUI is open. The server will surface a clear error if you forget.
+> **MCP server mode:** This repo uses **Streamable HTTP mode** (SF UI stays open, data visible in real time). If you prefer STDIO mode (headless, no UI), see the [Screaming Frog MCP docs](https://www.screamingfrog.co.uk/guides/mcp-server/) for the Claude Desktop extension setup — note that STDIO mode is Claude Desktop only and requires a different `.mcp.json` format.
 
 ---
 
@@ -122,12 +123,11 @@ The HTML one-pager is the shareable artifact: self-contained, zero dependencies,
 
 ## Cost per audit
 
-Calibrated against two real runs in May 2026 (Claude Opus 4.7 with prompt caching enabled):
+Calibrated against a real run in May 2026 (Claude Opus 4.7 with prompt caching enabled):
 
 | Site | URLs crawled | Pages scored | Wall time | API cost |
 |---|---|---|---|---|
 | anthropic.com | 4,042 | 352 | 31 min | $3.94 |
-| praxent.com | 3,356 | 505 | 25 min | $5.85 |
 
 **Typical audit cost: ~$3 to $6 USD per run** for sites with 300 to 500 indexable pages. Most input tokens are template + rubric + skill context, all cache-hittable across the audit's many tool calls, so the cache-read price ($1.50/M) dominates over the full input price.
 
@@ -141,7 +141,7 @@ More expensive cases:
 - **Prompt caching disabled:** about 3x more expensive. Most of the savings here come from reusing the rubric and report template across page scoring.
 - **JS rendering on (for SPAs):** crawl time grows, more content per page reaches the scorer. Add 30% to 50%.
 
-These numbers will move as Claude pricing and the underlying skill evolve. The two source audits live in this repo's git log under the `docs: calibrate cost-per-audit` commit if you want to re-derive.
+These numbers will move as Claude pricing and the underlying skill evolve. The source audit lives in this repo's git log under the `docs: calibrate cost-per-audit` commit if you want to re-derive.
 
 ---
 
@@ -218,7 +218,6 @@ MIT. See [LICENSE](LICENSE).
 
 ## Credits
 
-- [Screaming Frog](https://www.screamingfrog.co.uk/) for the SEO Spider crawler this whole audit is built on.
-- [bzsasson/screaming-frog-mcp](https://github.com/bzsasson/screaming-frog-mcp) for the community MCP server that wires Screaming Frog into Claude.
+- [Screaming Frog](https://www.screamingfrog.co.uk/) for the SEO Spider crawler and the built-in MCP server this audit is powered by.
 - [llmstxt.org](https://llmstxt.org/) for the `llms.txt` spec.
 - [ai.robots.txt](https://github.com/ai-robots-txt/ai.robots.txt) for the AI crawler reference list.
