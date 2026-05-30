@@ -31,7 +31,7 @@ Before running, the Screaming Frog SEO Spider MCP server (built into SF v24+) mu
 - `sf_export_seo_element_urls` — export URLs and data for a specific SEO element (H1, H2, titles, schema, etc.)
 - `sf_bulk_export_page_content` — bulk-export full page content in NDJSON format (use for citability analysis)
 - `sf_url_info` — detailed JSON report for a single URL
-- `sf_url_links` — inlinks or outlinks for a URL (use for inlink count per page)
+- `sf_url_links` — inlinks or outlinks for a URL
 - `sf_list_available_bulk_exports` — list all available bulk export categories
 
 If tools are not visible, run `claude mcp list` and verify `seospider` appears as connected.
@@ -39,6 +39,8 @@ If tools are not visible, run `claude mcp list` and verify `seospider` appears a
 If the MCP server is not available, stop and direct the user to the setup steps in `README.md`. The user needs Screaming Frog SEO Spider v24+ installed and the MCP server started via the SF menu (`MCP > Start MCP Server`) or via `File > Settings > MCP Server`.
 
 **Critical pre-flight check:** Start the MCP server from within the SF UI (`MCP > Start MCP Server`) or enable auto-start in `File > Settings > MCP Server`. The server URL will show as `http://localhost:11435/mcp` in the SF status bar. If a tool call returns a connection error, confirm the server is running before retrying.
+
+**SF Node runtime:** The Node.js runtime inside SF is disabled by default (`File > Settings > MCP Server > Enable Node tools`). The `sf_run_node_js_script` calls in this skill will fail silently if it is off. If Node is unavailable, fall back to running the scripts locally via bash: `node scripts/<script>.js <args>` from the repo root. The scripts are standard Node and work identically outside SF.
 
 ## The audit dimensions
 
@@ -83,16 +85,16 @@ The official MCP handles custom extractions natively via the export tools — no
 
 Use the official MCP tools to pull all data needed for scoring:
 
-- `sf_generate_bulk_export` with category `"Internal"` — all crawled URLs with status, indexability, word count, response time.
+- `sf_generate_bulk_export` with category `"Internal"` — all crawled URLs with status, indexability, word count, response time, inlink count, and Flesch Reading Ease. **Use this as the primary data source for inlink counts and readability scores — no per-page `sf_url_links` calls needed.**
 - `sf_export_seo_element_urls` with `seo_element_name="Structured Data"` — JSON-LD blocks per page.
 - `sf_export_seo_element_urls` with `seo_element_name="H1"` — H1 text per URL.
 - `sf_export_seo_element_urls` with `seo_element_name="H2"` — H2 text per URL.
 - `sf_export_seo_element_urls` with `seo_element_name="Page Titles"` — title tags.
 - `sf_export_seo_element_urls` with `seo_element_name="Meta Description"` — meta descriptions.
 - `sf_export_seo_element_urls` with `seo_element_name="Canonicals"` — canonical URL per page.
-- `sf_bulk_export_page_content` — full page text in NDJSON format; use for citability analysis (first 200 words, Q&A blocks, named entities, author bylines, dates, external links).
-- `sf_url_links` with `links_direction="inlinks"` for each page in the top-50 by estimated traffic -- use to build the inlink count table needed for priority sorting and site score weighting.
-- `sf_url_links` with `links_direction="outlinks"` for each indexable page -- use to score two rubric checks deterministically: (1) external link count for Citability "cited sources" check (>=2 distinct external domains = 3pts, else 0); (2) authoritative outlink check for Authority (filter for .gov, .edu, wikipedia.org, pubmed.ncbi.nlm.nih.gov, w3.org, ietf.org, schema.org -- >=1 match = 3pts, else 0). Do not infer these from page text; use the outlink data.
+- `sf_bulk_export_page_content` — full page text in NDJSON format; use for citability analysis (first 200 words, Q&A blocks, named entities, author bylines, dates, external links). **Requires "Store HTML" enabled in SF before crawl.**
+- `sf_generate_bulk_export` with category `"External Links"` — all outlinks to external domains; use to score the Authority (authoritative outlinks) and Citability (external citations) rubric checks deterministically.
+- `sf_url_links` with `links_direction="inlinks"` is only needed for individual spot-checks; inlink counts for scoring come from the Internal export above.
 
 ### 5. Score per page
 
@@ -360,6 +362,15 @@ Surface to chat:
 
 **Site returns 403 / auth-gated pages:**
 - Configure SF Basic Auth or cookie-based authentication in Screaming Frog settings before invoking `sf_crawl`. Document which pages were excluded.
+
+**`sf_bulk_export_page_content` returns empty / no content records:**
+- "Store HTML" was not enabled before the crawl. Enable it under `Configuration > Spider > Extraction` (macOS) or `File > Settings > Spider > Extraction` (Windows/Linux), then re-crawl. Without it, Citability scoring and artifacts C, D, F, G are skipped.
+
+**Screenshots not appearing in priority table:**
+- Screenshots require a separate setting from "Store HTML". Enable "Store screenshots" under `Configuration > Spider > Advanced` before crawling. Re-crawl after enabling.
+
+**`sf_run_node_js_script` fails or returns empty:**
+- Node tools are disabled by default in SF. Enable via `File > Settings > MCP Server > Enable Node tools`. If you prefer not to enable it, run the scripts locally: `node scripts/<script>.js <args>` from the repo root.
 
 ## Output rules
 
