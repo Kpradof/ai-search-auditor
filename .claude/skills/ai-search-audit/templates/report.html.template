@@ -115,6 +115,8 @@
   table td.score.warn { color: var(--warn); }
   table td.score.good { color: var(--good); }
   table td a { color: var(--accent-2); text-decoration: none; word-break: break-all; }
+  .thumb { margin-top: 6px; }
+  .thumb img { max-width: 180px; max-height: 120px; border-radius: 6px; border: 1px solid var(--line); display: block; }
 
   .artifacts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   @media (max-width: 760px) { .artifacts { grid-template-columns: 1fr; } }
@@ -190,6 +192,8 @@
       <div class="blocker">{{authority_blocker}}</div>
     </div>
   </div>
+
+  {{delta_html}}
 
   <section class="card">
     <h2>Top 5 fixes that move the needle</h2>

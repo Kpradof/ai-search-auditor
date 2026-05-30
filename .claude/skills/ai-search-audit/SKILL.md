@@ -61,6 +61,7 @@ Ask the user (skip if already in request):
 - Crawl cap (default: 500 URLs).
 - JS rendering on/off (default: off; turn on for SPAs).
 - Page-set focus: full site, blog only, product pages only, etc.
+- Re-audit or first run? If re-audit, call `sf_list_crawls` to check for a prior crawl of the same domain. If one exists, load it with `sf_load_crawl` and extract the previous scores from `reports/<domain>/audit-*.md` (most recent file). Use these to compute deltas in the report.
 
 ### 2. Pre-crawl checks (no crawl yet)
 
@@ -90,7 +91,8 @@ Use the official MCP tools to pull all data needed for scoring:
 - `sf_export_seo_element_urls` with `seo_element_name="Meta Description"` — meta descriptions.
 - `sf_export_seo_element_urls` with `seo_element_name="Canonicals"` — canonical URL per page.
 - `sf_bulk_export_page_content` — full page text in NDJSON format; use for citability analysis (first 200 words, Q&A blocks, named entities, author bylines, dates, external links).
-- `sf_url_links` with `links_direction="inlinks"` for each page in the top-50 by estimated traffic — use to build the inlink count table needed for priority sorting and site score weighting.
+- `sf_url_links` with `links_direction="inlinks"` for each page in the top-50 by estimated traffic -- use to build the inlink count table needed for priority sorting and site score weighting.
+- `sf_url_links` with `links_direction="outlinks"` for each indexable page -- use to score two rubric checks deterministically: (1) external link count for Citability "cited sources" check (>=2 distinct external domains = 3pts, else 0); (2) authoritative outlink check for Authority (filter for .gov, .edu, wikipedia.org, pubmed.ncbi.nlm.nih.gov, w3.org, ietf.org, schema.org -- >=1 match = 3pts, else 0). Do not infer these from page text; use the outlink data.
 
 ### 5. Score per page
 
@@ -133,6 +135,52 @@ Limit to top 50 pages by inlink count, grouped by URL path prefix.
 
 **D. `reports/<domain>/content-rewrite-recs.md`:** for each Weak/Invisible page in the top-50 by inlinks, write a specific restructuring recommendation. Format: current opening (quoted), problem (one line), suggested rewrite of first paragraph (Q&A or definitive-answer style).
 
+**E. `reports/<domain>/orphan-pages.md`:** list of all indexable 200-status pages with 0 internal inlinks, derived from the `sf_url_links` inlink data collected in step 4. These pages are unreachable by LLM crawlers regardless of content quality. Format:
+
+```markdown
+# Orphan Pages: <domain>
+
+<n> indexable pages have zero internal inlinks. LLM crawlers cannot reach them through site navigation.
+
+## Fix options
+- Add links to orphan pages from relevant hub pages or the sitemap.
+- If pages are intentionally standalone, add them to llms.txt directly.
+- If pages have no value, consider removing or redirecting them.
+
+## Orphan page list
+| URL | Title | Score |
+|---|---|---|
+| /path/to/page | Page Title | 42 |
+...
+```
+
+Skip this artifact (write empty file with note) if 0 orphan pages found.
+
+**F. `reports/<domain>/faq-gap-pages.md`:** pages with FAQ-style content but no FAQPage schema. Run via `sf_run_node_js_script`:
+
+1. Use `sf_write_text_file` to write `scripts/faq-gap-detect.js` from the repo (read it with `sf_read_text_file` first if needed).
+2. Call `sf_run_node_js_script` with script path `scripts/faq-gap-detect.js` and args `[<content_ndjson_path>, <schema_ndjson_path>, <output_md_path>]`, where paths are relative to the SF allowed base directory.
+3. The script outputs the markdown file directly. Read it back with `sf_read_text_file` and save to `reports/<domain>/faq-gap-pages.md`.
+
+Pages in this list should also get FAQPage schema patches generated in artifact C.
+
+**G. `reports/<domain>/readability-scores.md`:** Flesch-Kincaid Reading Ease per page. Dense prose (score < 50) is harder for LLMs to cite verbatim. Run via `sf_run_node_js_script`:
+
+1. Write `scripts/readability-score.js` to the SF allowed directory via `sf_write_text_file`.
+2. Call `sf_run_node_js_script` with args `[<content_ndjson_path>, <output_md_path>]`. No npm install needed -- the script uses only Node built-ins.
+3. Read back and save to `reports/<domain>/readability-scores.md`.
+
+The script outputs site average FK score and a priority list of pages scoring below 50. Include the site average FK score as a one-line stat in the main report's Score breakdown section.
+
+**H. `reports/<domain>/topic-gap.md`:** topic cluster analysis using page embeddings. Identifies thin coverage areas (< 3 pages on same topic) where the site lacks authority. Useful for content strategy beyond fixing existing pages. Run via `sf_run_node_js_script`:
+
+1. Call `sf_export_embeddings` with a file path to save the CSV.
+2. Write `scripts/topic-gap.js` via `sf_write_text_file`.
+3. Call `sf_run_node_js_script` with args `[<embeddings_csv_path>, <titles_ndjson_path>, <output_md_path>]`.
+4. Read back and save to `reports/<domain>/topic-gap.md`.
+
+Note: `sf_export_embeddings` requires the crawl to have been run with the Screaming Frog embeddings feature enabled (`File > Settings > Content > Embeddings`). If embeddings are not available, skip this artifact and note it in the report.
+
 ### 8. Write the main report (markdown + HTML one-pager)
 
 Two formats, same data, both written every run.
@@ -159,6 +207,17 @@ Two formats, same data, both written every run.
 | Citability | x/20 | ... |
 | Authority  | x/20 | ... |
 
+## Score delta (vs previous audit)
+Only include this section if a prior audit exists for the domain.
+| Dimension | Previous | Current | Delta |
+|---|---|---|---|
+| Bot Access | x/20 | x/20 | +n / -n |
+| Discovery | x/20 | x/20 | +n / -n |
+| Structure | x/20 | x/20 | +n / -n |
+| Citability | x/20 | x/20 | +n / -n |
+| Authority  | x/20 | x/20 | +n / -n |
+| **Site total** | x/100 | x/100 | **+n / -n** |
+
 ## Top 5 fixes that move the needle
 1. <fix>. Effort: S/M/L · expected score gain: +n
 2. ...
@@ -174,6 +233,10 @@ Two formats, same data, both written every run.
 - Robots patch: `reports/<domain>/robots-ai-bots-patch.txt`
 - Schema patches: `reports/<domain>/schema-patches/` (<n> files)
 - Content rewrite recs: `reports/<domain>/content-rewrite-recs.md`
+- Orphan pages: `reports/<domain>/orphan-pages.md` (<n> pages with 0 inlinks)
+- FAQ schema gaps: `reports/<domain>/faq-gap-pages.md` (<n> pages)
+- Readability scores: `reports/<domain>/readability-scores.md` (site avg FK: <n>)
+- Topic gap analysis: `reports/<domain>/topic-gap.md` (<n> thin clusters)
 
 ## Appendix: full per-page scores
 <table>
@@ -210,6 +273,8 @@ Render `reports/<domain>/audit-<YYYY-MM-DD>.html` from `.claude/skills/ai-search
 | `{{bucket_strong}}`, `{{bucket_decent}}`, `{{bucket_weak}}`, `{{bucket_invisible}}` | page counts |
 | `{{priority_rows_html}}` | `<tr>` rows for top-10 invisible pages by inlink count |
 | `{{artifacts_html}}` | one `.artifact` div per generated file |
+| `{{orphan_count}}` | integer count of orphan pages (0 inlinks); used in the artifacts div label |
+| `{{delta_html}}` | score delta section HTML (see format below); empty string `""` if no prior audit exists |
 | `{{expected_post_fix_score}}` | integer estimate after top-5 fixes shipped |
 
 **`.fix` div format** (inject into `{{fixes_html}}`):
@@ -224,17 +289,39 @@ Use class `s` / `m` / `l` on the `.pill` matching effort. Repeat for all five fi
 
 **`<tr>` row format** for priority table:
 
-The priority table shows the **top 10 pages by inlink count that score below Decent (< 60)**. This includes both Weak and Invisible pages and always surfaces the highest-traffic pages that need fixes -- which is what matters to clients. Sort by inlink count descending within that filtered set.
+The priority table shows the **top 10 pages by inlink count that score below Decent (< 60)**. For each page, call `sf_get_url_screenshot` to get the stored screenshot and embed it as a base64 `data:image/png;base64,...` string. If SF has no screenshot for a URL (crawled without screenshot mode), omit the `<img>` and leave the cell empty.
 
 ```html
 <tr>
-  <td><a href="{{url}}">{{path}}</a></td>
+  <td>
+    <a href="{{url}}">{{path}}</a>
+    <div class="thumb"><img src="data:image/png;base64,{{screenshot_b64}}" alt="{{path}} screenshot" loading="lazy"></div>
+  </td>
   <td>{{inlinks}}</td>
   <td class="score bad">{{score}}</td>
   <td>{{top_miss}}</td>
 </tr>
 ```
 Class on `.score` cell: `bad` if <40, `warn` if 40-59, `good` if >=60.
+
+**`{{delta_html}}` format** (inject when prior audit exists, otherwise use empty string):
+```html
+<section class="card">
+  <h2>Score delta vs. previous audit (<prev_date>)</h2>
+  <table>
+    <thead><tr><th>Dimension</th><th>Previous</th><th>Current</th><th>Delta</th></tr></thead>
+    <tbody>
+      <tr><td>Bot Access</td><td>x/20</td><td>x/20</td><td class="score good">+n</td></tr>
+      <tr><td>Discovery</td><td>x/20</td><td>x/20</td><td class="score bad">-n</td></tr>
+      <tr><td>Structure</td><td>x/20</td><td>x/20</td><td>0</td></tr>
+      <tr><td>Citability</td><td>x/20</td><td>x/20</td><td class="score good">+n</td></tr>
+      <tr><td>Authority</td><td>x/20</td><td>x/20</td><td class="score good">+n</td></tr>
+      <tr><td><strong>Site total</strong></td><td>x/100</td><td>x/100</td><td class="score good"><strong>+n</strong></td></tr>
+    </tbody>
+  </table>
+</section>
+```
+Delta cell class: `good` if positive, `bad` if negative, no class if zero.
 
 **`.artifact` div format:**
 ```html
