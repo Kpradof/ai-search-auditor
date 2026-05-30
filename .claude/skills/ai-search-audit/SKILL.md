@@ -155,6 +155,14 @@ Limit to top 50 pages by inlink count, grouped by URL path prefix.
 
 Skip this artifact (write empty file with note) if 0 orphan pages found.
 
+**F. `reports/<domain>/faq-gap-pages.md`:** pages with FAQ-style content but no FAQPage schema. Run via `sf_run_node_js_script`:
+
+1. Use `sf_write_text_file` to write `scripts/faq-gap-detect.js` from the repo (read it with `sf_read_text_file` first if needed).
+2. Call `sf_run_node_js_script` with script path `scripts/faq-gap-detect.js` and args `[<content_ndjson_path>, <schema_ndjson_path>, <output_md_path>]`, where paths are relative to the SF allowed base directory.
+3. The script outputs the markdown file directly. Read it back with `sf_read_text_file` and save to `reports/<domain>/faq-gap-pages.md`.
+
+Pages in this list should also get FAQPage schema patches generated in artifact C.
+
 ### 8. Write the main report (markdown + HTML one-pager)
 
 Two formats, same data, both written every run.
@@ -197,6 +205,7 @@ Two formats, same data, both written every run.
 - Schema patches: `reports/<domain>/schema-patches/` (<n> files)
 - Content rewrite recs: `reports/<domain>/content-rewrite-recs.md`
 - Orphan pages: `reports/<domain>/orphan-pages.md` (<n> pages with 0 inlinks)
+- FAQ schema gaps: `reports/<domain>/faq-gap-pages.md` (<n> pages)
 
 ## Appendix: full per-page scores
 <table>
